@@ -1,0 +1,497 @@
+'use client';
+
+import { useState, useRef } from 'react';
+import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Mic } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export default function Home() {
+  const [inputs, setInputs] = useState({ userName: '', userBirthday: '', userGender: 'Female', idolName: '', language: 'en' });
+  const [birthday, setBirthday] = useState({ year: '', month: '', day: '' });
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [idolData, setIdolData] = useState({ image: '', track: '', previewUrl: '' });
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  
+  // 생일 입력 자동 이동을 위한 refs
+  const monthRef = useRef<HTMLInputElement>(null);
+  const dayRef = useRef<HTMLInputElement>(null);
+  const genderRef = useRef<HTMLSelectElement>(null);
+  
+  // 생일 입력 핸들러 (자동 다음 필드 이동)
+  const handleBirthdayChange = (field: 'year' | 'month' | 'day', value: string) => {
+    // 숫자만 허용
+    const numValue = value.replace(/\D/g, '');
+    
+    const newBirthday = { ...birthday, [field]: numValue };
+    setBirthday(newBirthday);
+    
+    // 완성된 생일을 inputs에 저장 (YYYY-MM-DD 형식)
+    if (newBirthday.year.length === 4 && newBirthday.month.length >= 1 && newBirthday.day.length >= 1) {
+      const formattedDate = `${newBirthday.year}-${newBirthday.month.padStart(2, '0')}-${newBirthday.day.padStart(2, '0')}`;
+      setInputs(prev => ({ ...prev, userBirthday: formattedDate }));
+    }
+    
+    // 자동 다음 필드 이동
+    if (field === 'year' && numValue.length === 4) {
+      monthRef.current?.focus();
+    } else if (field === 'month' && numValue.length === 2) {
+      dayRef.current?.focus();
+    } else if (field === 'day' && numValue.length === 2) {
+      genderRef.current?.focus();
+    }
+  };
+
+  // 📝 6개 국어 완벽 번역 데이터 (질문 + 버튼 + 결과 라벨 + 플레이스홀더)
+  const t: any = {
+    en: { 
+      title: "My K-POP Name", 
+      subtitle: "Find a name perfectly compatible with your Bias! 💘", 
+      lblLanguage: "Select Language",
+      lblName: "What is your name?", 
+      phName: "e.g. Emily",
+      lblBirthday: "When is your birthday? 🎂",
+      lblGender: "Select your Gender", 
+      optFemale: "Girl 👧", optMale: "Boy 👦", optUnisex: "Unisex ✨",
+      lblBias: "Who is your Ultimate Bias?", 
+      phBias: "e.g. Jennie, RM",
+      btn: "Check Chemistry & Get Name ✨", 
+      loading: "Asking your Bias...",
+      // 결과창 라벨
+      resScore: "MATCH SCORE",
+      resReason: "Why this match? 🔥",
+      resMeaning: "Name Meaning",
+      // 하단 안내
+      footerPrivacy: "This service does not store any personal information entered.",
+      footerDesc: "This service uses AI to create Korean names with the same surname as your ultimate bias."
+    },
+    ko: { 
+      title: "나의 케이팝 이름", 
+      subtitle: "최애와 찰떡궁합인 내 이름은? 💘", 
+      lblLanguage: "언어 선택",
+      lblName: "당신의 이름은 무엇인가요?", 
+      phName: "예: 김이름",
+      lblBirthday: "생일이 언제인가요? 🎂",
+      lblGender: "성별을 선택해주세요", 
+      optFemale: "여성 👧", optMale: "남성 👦", optUnisex: "무관 ✨",
+      lblBias: "당신의 '최애'는 누구인가요?", 
+      phBias: "예: 제니, RM",
+      btn: "궁합 보고 이름 짓기 ✨", 
+      loading: "최애에게 허락받는 중...",
+      resScore: "궁합 점수",
+      resReason: "우리가 천생연분인 이유 🔥",
+      resMeaning: "이름의 뜻",
+      footerPrivacy: "본 서비스는 입력된 개인 정보를 저장하지 않습니다.",
+      footerDesc: "본 서비스는 AI를 활용하여 최애의 성과 같은 성으로 한국 이름을 지어주는 서비스입니다."
+    },
+    jp: {
+      title: "私のK-POP名",
+      subtitle: "推しと相性ぴったりの名前は？ 💘",
+      lblLanguage: "言語選択",
+      lblName: "あなたの名前は何ですか？",
+      phName: "例: 田中",
+      lblBirthday: "誕生日はいつですか？ 🎂",
+      lblGender: "性別を選択してください",
+      optFemale: "女性 👧", optMale: "男性 👦", optUnisex: "性別なし ✨",
+      lblBias: "あなたの「最推し」は誰ですか？",
+      phBias: "例: Jennie, RM",
+      btn: "相性チェック & 名前作成 ✨",
+      loading: "推しに許可をもらっています...",
+      resScore: "相性スコア",
+      resReason: "相性抜群の理由 🔥",
+      resMeaning: "名前の意味",
+      footerPrivacy: "本サービスは入力された個人情報を保存しません。",
+      footerDesc: "本サービスはAIを活用して、推しと同じ苗字の韓国名を作成するサービスです。"
+    },
+    th: {
+      title: "ชื่อ K-POP ของฉัน",
+      subtitle: "ค้นหาชื่อที่เข้ากับเมนของคุณที่สุด! 💘",
+      lblLanguage: "เลือกภาษา",
+      lblName: "คุณชื่ออะไร?",
+      phName: "เช่น สมชาย",
+      lblBirthday: "วันเกิดของคุณคือเมื่อไหร่? 🎂",
+      lblGender: "เลือกเพศของคุณ",
+      optFemale: "หญิง 👧", optMale: "ชาย 👦", optUnisex: "ไม่ระบุ ✨",
+      lblBias: "เมน (Ultimate Bias) ของคุณคือใคร?",
+      phBias: "เช่น Lisa, BamBam",
+      btn: "เช็คความเข้ากัน & ตั้งชื่อ ✨",
+      loading: "กำลังขออนุญาตเมนของคุณ...",
+      resScore: "คะแนนความเข้ากัน",
+      resReason: "ทำไมถึงเข้ากันได้ดี? 🔥",
+      resMeaning: "ความหมายของชื่อ",
+      footerPrivacy: "บริการนี้ไม่เก็บข้อมูลส่วนบุคคลที่ป้อน",
+      footerDesc: "บริการนี้ใช้ AI เพื่อสร้างชื่อเกาหลีที่มีนามสกุลเดียวกับเมนของคุณ"
+    },
+    es: {
+      title: "Mi Nombre K-POP",
+      subtitle: "¡Encuentra un nombre compatible con tu Bias! 💘",
+      lblLanguage: "Seleccionar idioma",
+      lblName: "¿Cómo te llamas?",
+      phName: "ej. Maria",
+      lblBirthday: "¿Cuándo es tu cumpleaños? 🎂",
+      lblGender: "Selecciona tu género",
+      optFemale: "Mujer 👧", optMale: "Hombre 👦", optUnisex: "Unisex ✨",
+      lblBias: "¿Quién es tu Bias Supremo?",
+      phBias: "ej. V, Karina",
+      btn: "Ver Química y Obtener Nombre ✨",
+      loading: "Pidiendo permiso a tu Bias...",
+      resScore: "PUNTUACIÓN",
+      resReason: "¿Por qué hacemos match? 🔥",
+      resMeaning: "Significado del nombre",
+      footerPrivacy: "Este servicio no almacena ninguna información personal ingresada.",
+      footerDesc: "Este servicio utiliza IA para crear nombres coreanos con el mismo apellido que tu Bias."
+    },
+    ar: {
+      title: "اسم الكيبوب الخاص بي",
+      subtitle: "اعثر على اسم متوافق تمامًا مع البايس الخاص بك! 💘",
+      lblLanguage: "اختار اللغة",
+      lblName: "ما هو اسمك؟",
+      phName: "مثال: مريم",
+      lblBirthday: "متى عيد ميلادك؟ 🎂",
+      lblGender: "اختر جنسك",
+      optFemale: "أنثى 👧", optMale: "ذكر 👦", optUnisex: "غير محدد ✨",
+      lblBias: "من هو البايس الخاص بك؟",
+      phBias: "مثال: Jimin, RM",
+      btn: "تحقق من التوافق واحصل على الاسم ✨",
+      loading: "جاري طلب الإذن من البايس...",
+      resScore: "نتيجة التوافق",
+      resReason: "لماذا هذا التوافق؟ 🔥",
+      resMeaning: "معنى الاسم",
+      footerPrivacy: "هذه الخدمة لا تخزن أي معلومات شخصية تم إدخالها.",
+      footerDesc: "تستخدم هذه الخدمة الذكاء الاصطناعي لإنشاء أسماء كورية بنفس لقب البايس الخاص بك."
+    }
+  };
+  
+  const txt = t[inputs.language] || t.en;
+
+  // 아랍어일 경우 RTL(오른쪽 정렬) 적용
+  const isRTL = inputs.language === 'ar';
+
+  const fetchIdolData = async () => {
+    if (inputs.idolName.length < 2) return;
+    try {
+      const res = await fetch(`https://itunes.apple.com/search?term=${inputs.idolName}&entity=song&limit=1`);
+      const data = await res.json();
+      if (data.resultCount > 0) {
+        const song = data.results[0];
+        setIdolData({
+          image: song.artworkUrl100.replace('100x100', '600x600'),
+          track: `${song.trackName} - ${song.artistName}`,
+          previewUrl: song.previewUrl
+        });
+      }
+    } catch (e) { console.error(e); }
+  };
+
+  const generateName = async () => {
+    if (!inputs.userName || !inputs.idolName) return alert("Please fill in all fields!");
+    setLoading(true);
+    setResult(null);
+    
+    try {
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        body: JSON.stringify(inputs),
+      });
+      const data = await res.json();
+      
+      if (data.error) { alert("Error: " + data.error); return; }
+      
+      setResult(data);
+      
+      // 음악 자동 재생 (사용자 상호작용 후이므로 가능)
+      if (idolData.previewUrl && audioRef.current) {
+        const audio = audioRef.current;
+        audio.pause(); // 기존 재생 먼저 중지
+        audio.currentTime = 0;
+        audio.src = idolData.previewUrl;
+        audio.volume = 0.3;
+        
+        // play() Promise 안전 처리
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise
+            .then(() => setIsPlaying(true))
+            .catch((err) => {
+              console.log('Audio autoplay blocked:', err.message);
+              setIsPlaying(false);
+            });
+        }
+      }
+    } catch (e) { alert("Something went wrong. Please try again!"); } 
+    finally { setLoading(false); }
+  };
+
+  // 🔊 한국어 이름 발음 듣기 (TTS) - 한 글자씩 천천히 (버벅거림 없이)
+  const speakKoreanName = (name: string) => {
+    if (!('speechSynthesis' in window)) {
+      alert('죄송합니다. 이 브라우저에서는 음성 기능을 지원하지 않습니다.');
+      return;
+    }
+
+    // 배경 음악 일시정지 (충돌 방지)
+    if (audioRef.current && isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+
+    // 기존 TTS 재생 중지
+    window.speechSynthesis.cancel();
+    
+    // 이름을 한 글자씩 분리 + 마지막에 전체 이름 추가
+    const characters = [...name.split(''), name];
+    let currentIndex = 0;
+    
+    const speakNext = () => {
+      if (currentIndex >= characters.length) return;
+      
+      const char = characters[currentIndex];
+      const isLastFullName = currentIndex === characters.length - 1;
+      
+      const utterance = new SpeechSynthesisUtterance(char);
+      utterance.lang = 'ko-KR';
+      utterance.rate = isLastFullName ? 0.85 : 0.7;  // 전체 이름은 약간 빠르게
+      utterance.pitch = 1.1;
+      
+      // 현재 발음이 끝나면 다음 글자 읽기
+      utterance.onend = () => {
+        currentIndex++;
+        // 글자 사이에 짧은 휴식
+        setTimeout(speakNext, isLastFullName ? 0 : 400);
+      };
+      
+      window.speechSynthesis.speak(utterance);
+    };
+    
+    // 첫 글자 시작
+    speakNext();
+  };
+
+  return (
+    <div className={`min-h-screen bg-[#050505] text-white font-sans flex items-center justify-center p-4 selection:bg-pink-500 selection:text-white ${isRTL ? 'font-arabic' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
+      {/* 폰트 로드 (Next.js 방식이 아니므로 HTML style 태그 활용) */}
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+Thai&family=Noto+Sans+Arabic&display=swap');
+        .font-arabic { font-family: 'Noto Sans Arabic', sans-serif; }
+      `}</style>
+
+      <div className="fixed top-0 left-0 w-64 h-64 bg-purple-600 rounded-full blur-[100px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="fixed bottom-0 right-0 w-64 h-64 bg-pink-600 rounded-full blur-[100px] opacity-20 translate-x-1/2 translate-y-1/2 pointer-events-none" />
+
+      <div className="w-full max-w-md relative z-10">
+        
+        <div className="bg-gray-900/40 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-black mb-2 bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 drop-shadow-[0_0_15px_rgba(217,70,239,0.3)]">
+              {txt.title}
+            </h1>
+            <p className="text-pink-200/60 text-sm font-light">{txt.subtitle}</p>
+          </div>
+
+          <div className="space-y-6">
+            
+            {/* 1. 언어 선택 */}
+            <div className={`flex flex-col gap-1 ${isRTL ? 'items-start' : 'items-end'}`}>
+               <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{txt.lblLanguage}</label>
+               <div className="inline-flex items-center bg-white/5 border border-white/10 rounded-full px-3 py-1.5 backdrop-blur-md">
+                <Globe className="w-3 h-3 text-pink-400 mx-2" />
+                <select 
+                  value={inputs.language}
+                  onChange={(e) => setInputs({...inputs, language: e.target.value})}
+                  className="bg-transparent text-xs text-gray-200 outline-none appearance-none cursor-pointer px-2 font-medium"
+                >
+                  <option value="en" className="bg-gray-900">English</option>
+                  <option value="jp" className="bg-gray-900">日本語</option>
+                  <option value="th" className="bg-gray-900">ภาษาไทย</option>
+                  <option value="es" className="bg-gray-900">Español</option>
+                  <option value="ar" className="bg-gray-900">العربية</option>
+                  <option value="ko" className="bg-gray-900">한국어</option>
+                </select>
+              </div>
+            </div>
+
+            {/* 2. 이름 입력 */}
+            <div className="group">
+              <label className="text-sm font-bold text-pink-200 mb-2 block mx-1">{txt.lblName}</label>
+              <input 
+                type="text" 
+                placeholder={txt.phName}
+                className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all"
+                onChange={(e) => setInputs({...inputs, userName: e.target.value})}
+              />
+            </div>
+
+            {/* 2.5. 생일 입력 (년/월/일 분리, 자동 이동) */}
+            <div className="group">
+              <label className="text-sm font-bold text-pink-200 mb-2 block mx-1">{txt.lblBirthday}</label>
+              <div className="flex gap-2">
+                {/* 년도 (4자리) */}
+                <input 
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={4}
+                  placeholder="YYYY"
+                  value={birthday.year}
+                  className="w-24 bg-white/5 border border-white/10 rounded-xl p-4 text-white text-center placeholder-gray-600 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all"
+                  onChange={(e) => handleBirthdayChange('year', e.target.value)}
+                />
+                <span className="text-gray-500 self-center">/</span>
+                {/* 월 (2자리) */}
+                <input 
+                  ref={monthRef}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={2}
+                  placeholder="MM"
+                  value={birthday.month}
+                  className="w-16 bg-white/5 border border-white/10 rounded-xl p-4 text-white text-center placeholder-gray-600 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all"
+                  onChange={(e) => handleBirthdayChange('month', e.target.value)}
+                />
+                <span className="text-gray-500 self-center">/</span>
+                {/* 일 (2자리) */}
+                <input 
+                  ref={dayRef}
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={2}
+                  placeholder="DD"
+                  value={birthday.day}
+                  className="w-16 bg-white/5 border border-white/10 rounded-xl p-4 text-white text-center placeholder-gray-600 focus:outline-none focus:border-pink-500 focus:ring-1 focus:ring-pink-500 transition-all"
+                  onChange={(e) => handleBirthdayChange('day', e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* 3. 성별 & 최애 */}
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-bold text-pink-200 mb-2 block mx-1">{txt.lblGender}</label>
+                <select 
+                  ref={genderRef}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white outline-none appearance-none cursor-pointer"
+                  onChange={(e) => setInputs({...inputs, userGender: e.target.value})}
+                >
+                  <option value="Female" className="bg-gray-900">{txt.optFemale}</option>
+                  <option value="Male" className="bg-gray-900">{txt.optMale}</option>
+                  <option value="Non-binary" className="bg-gray-900">{txt.optUnisex}</option>
+                </select>
+              </div>
+              
+              <div className="relative">
+                <label className="text-sm font-bold text-pink-400 mb-2 block mx-1">{txt.lblBias}</label>
+                <div className="relative">
+                  <div className={`absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-gray-800 border-2 border-pink-500/50 bg-cover bg-center transition-all ${idolData.image ? 'opacity-100' : 'opacity-0'} ${isRTL ? 'right-3' : 'left-3'}`} 
+                       style={{ backgroundImage: `url(${idolData.image})` }} />
+                  <input 
+                    type="text" 
+                    placeholder={txt.phBias}
+                    className={`w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-pink-500 transition-all ${idolData.image ? (isRTL ? 'pr-16' : 'pl-16') : (isRTL ? 'pr-4' : 'pl-4')}`}
+                    onChange={(e) => setInputs({...inputs, idolName: e.target.value})}
+                    onBlur={fetchIdolData}
+                    onKeyDown={(e) => e.key === 'Enter' && fetchIdolData()}
+                  />
+                  <Search className={`absolute top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 ${isRTL ? 'left-4' : 'right-4'}`} />
+                </div>
+              </div>
+            </div>
+
+            <button 
+              onClick={generateName}
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-bold py-4 rounded-xl shadow-lg hover:shadow-pink-500/25 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2 mt-4"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : txt.btn}
+            </button>
+          </div>
+
+          <AnimatePresence>
+            {result && result.korean_name && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                className="mt-8 pt-8 border-t border-white/10 relative"
+              >
+                {idolData.previewUrl && (
+                  <button 
+                    onClick={() => {
+                      if (isPlaying) audioRef.current?.pause();
+                      else audioRef.current?.play();
+                      setIsPlaying(!isPlaying);
+                    }}
+                    className={`absolute top-8 bg-white/10 hover:bg-pink-500/50 p-2 rounded-full transition-colors z-20 ${isRTL ? 'left-0' : 'right-0'}`}
+                  >
+                    {isPlaying ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                  </button>
+                )}
+
+                <div className="text-center relative z-10">
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-xs font-bold tracking-wider mb-4 shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                  >
+                    <Heart className="w-3 h-3 fill-red-400 text-red-400" />
+                    {txt.resScore}: {result.compatibility_score}%
+                  </motion.div>
+
+                  {idolData.image && (
+                    <motion.div 
+                      animate={isPlaying ? { rotate: 360 } : { rotate: 0 }}
+                      transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                      className="w-28 h-28 mx-auto rounded-full border-4 border-gray-900 shadow-[0_0_30px_rgba(236,72,153,0.4)] mb-4 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${idolData.image})` }}
+                    >
+                      <div className="w-3 h-3 bg-black rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-gray-700" />
+                    </motion.div>
+                  )}
+                  
+                  {idolData.track && <p className="text-[10px] text-pink-300/80 mb-2 font-mono flex items-center justify-center gap-1"><Music className="w-3 h-3" /> {idolData.track}</p>}
+                  
+                  {/* 한국 이름 + 듣기 버튼 */}
+                  <div className="flex items-center justify-center gap-3 mb-2">
+                    <h2 className="text-5xl font-black text-white drop-shadow-md tracking-tight">{result.korean_name}</h2>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => speakKoreanName(result.korean_name)}
+                      className="p-2 bg-gradient-to-r from-pink-500/30 to-purple-500/30 hover:from-pink-500/50 hover:to-purple-500/50 rounded-full border border-pink-400/30 transition-all shadow-lg hover:shadow-pink-500/20"
+                      title="이름 발음 듣기"
+                    >
+                      <Volume2 className="w-5 h-5 text-pink-300" />
+                    </motion.button>
+                  </div>
+                  <p className="text-xl text-purple-400 font-medium mb-6">{result.romanized}</p>
+
+                  <div className={`bg-white/5 rounded-xl p-5 border border-white/5 space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <div className="pb-4 border-b border-white/5">
+                      <p className={`text-[10px] text-red-400 uppercase font-bold tracking-wider mb-1 flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                         {txt.resReason}
+                      </p>
+                      <p className="text-gray-200 text-sm font-medium leading-relaxed">{result.compatibility_reason}</p>
+                    </div>
+
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-1">{txt.resMeaning}</p>
+                      <p className="text-gray-300 text-sm leading-relaxed font-light">{result.meaning}</p>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        
+        {/* 하단 안내 문구 */}
+        <footer className="mt-6 text-center space-y-1">
+          <p className="text-[11px] text-gray-500 leading-relaxed">
+            🔒 {txt.footerPrivacy}
+          </p>
+          <p className="text-[11px] text-gray-600 leading-relaxed">
+            ✨ {txt.footerDesc}
+          </p>
+        </footer>
+      </div>
+      <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
+    </div>
+  );
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My K-POP Name Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+Thai&family=Noto+Sans+Arabic&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Poppins', 'Noto Sans KR', sans-serif; background-color: #050505; color: white; transition: all 0.3s; }
+        
+        /* 제니 스타일: 블랙 & 핫핑크 & 네온 퍼플 */
+        .neon-text { text-shadow: 0 0 10px #d946ef, 0 0 20px #d946ef; }
+        .glass-card { 
+            background: rgba(20, 20, 20, 0.75); 
+            backdrop-filter: blur(16px); 
+            border: 1px solid rgba(255, 105, 180, 0.2);
+            box-shadow: 0 0 30px rgba(217, 70, 239, 0.15);
+        }
+        .input-label { display: block; color: #fce7f3; font-size: 0.85rem; margin-bottom: 0.5rem; font-weight: 600; }
+        .input-field {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        .input-field:focus {
+            border-color: #d946ef;
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.4);
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+        .action-btn {
+            background: linear-gradient(90deg, #ec4899, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover { transform: scale(1.02); box-shadow: 0 0 25px rgba(236, 72, 153, 0.7); }
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid #d946ef; 
+            border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* LP판 회전 애니메이션 */
+        .spin-slow { animation: spin 10s linear infinite; }
+        
+        /* 오디오 비주얼라이저 효과 */
+        .equalizer-bar {
+            width: 4px; background: #ec4899; animation: equalizer 1s ease-in-out infinite;
+        }
+        @keyframes equalizer { 0%, 100% { height: 10px; } 50% { height: 25px; } }
+        .bar-1 { animation-delay: 0.1s; } .bar-2 { animation-delay: 0.2s; } .bar-3 { animation-delay: 0.3s; }
+        
+        /* 아랍어 RTL */
+        .rtl { direction: rtl; font-family: 'Noto Sans Arabic', sans-serif; }
+        .rtl .input-field { text-align: right; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="glass-card w-full max-w-md p-8 rounded-3xl relative overflow-hidden">
+        
+        <div class="absolute top-0 left-0 w-40 h-40 bg-purple-600 rounded-full mix-blend-multiply filter blur-[50px] opacity-20 -translate-x-10 -translate-y-10"></div>
+        <div class="absolute bottom-0 right-0 w-40 h-40 bg-pink-600 rounded-full mix-blend-multiply filter blur-[50px] opacity-20 translate-x-10 translate-y-10"></div>
+
+        <div class="relative z-10 space-y-6">
+            
+            <div class="flex justify-between items-center">
+                <div id="audio-status" class="hidden flex items-center gap-1">
+                    <div class="equalizer-bar bar-1"></div>
+                    <div class="equalizer-bar bar-2"></div>
+                    <div class="equalizer-bar bar-3"></div>
+                    <span class="text-[10px] text-pink-400 ml-1">Music Ready</span>
+                </div>
+                
+                <select id="language" onchange="changeLanguage()" class="bg-black/50 text-white text-xs py-1 px-3 rounded-full border border-gray-600 focus:outline-none cursor-pointer hover:border-pink-500 transition-colors ml-auto">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="jp">🇯🇵 日本語</option>
+                    <option value="th">🇹🇭 ภาษาไทย</option>
+                    <option value="es">🇪🇸 Español</option>
+                    <option value="ar">🇸🇦 العربية</option>
+                    <option value="ko">🇰🇷 한국어</option>
+                </select>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-3xl font-extrabold mb-2 neon-text tracking-tight" id="txt-title">My K-POP Name</h1>
+                <p class="text-pink-200 text-sm font-light leading-relaxed" id="txt-subtitle">
+                    Do you want to share your Bias's Family Name? 💍
+                </p>
+            </div>
+
+            <div class="space-y-5">
+                <input type="password" id="apiKey" placeholder="Gemini API Key (Required)" class="input-field w-full p-3 rounded-xl text-xs text-center text-gray-400 border-dashed bg-black/30">
+
+                <div>
+                    <label class="input-label" id="lbl-name">What is your name?</label>
+                    <input type="text" id="userName" placeholder="e.g. Emily, 田中" class="input-field w-full p-4 rounded-xl text-sm">
+                </div>
+
+                <div>
+                    <label class="input-label" id="lbl-gender">Select your Gender</label>
+                    <select id="userGender" class="input-field w-full p-4 rounded-xl text-sm appearance-none cursor-pointer">
+                        <option value="Female" id="opt-female">Female 👧</option>
+                        <option value="Male" id="opt-male
