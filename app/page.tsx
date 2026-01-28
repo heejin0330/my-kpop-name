@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import html2canvas from 'html2canvas';
+import * as htmlToImage from 'html-to-image';
 
 export default function Home() {
   const [inputs, setInputs] = useState({ userName: '', userBirthday: '', userGender: 'Female', idolName: '', language: 'en' });
@@ -74,16 +74,14 @@ export default function Home() {
     if (!resultCardRef.current) return;
     
     try {
-      const canvas = await html2canvas(resultCardRef.current, {
+      const dataUrl = await htmlToImage.toPng(resultCardRef.current, {
+        cacheBust: true,
         backgroundColor: '#0a0a0a',
-        scale: 2, // 고화질
-        useCORS: true,
-        logging: false,
       });
-      
+
       const link = document.createElement('a');
       link.download = `my-kpop-name-${result.korean_name}.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.href = dataUrl;
       link.click();
     } catch (err) {
       console.error('Image download failed:', err);
@@ -156,7 +154,9 @@ export default function Home() {
       // 검색
       searchResults: "Search Results",
       searchNoResults: "No results found",
-      searchSelect: "Select"
+      searchSelect: "Select",
+      // 성씨
+      sameSurname: "Same Family Name"
     },
     ko: { 
       title: "나의 케이팝 이름", 
@@ -183,7 +183,8 @@ export default function Home() {
       shareMeta: "당신의 최애와 같은 성을 가진 한국 이름을 만들어 보세요!!!!!!😍🎶💖🥰",
       searchResults: "검색 결과",
       searchNoResults: "검색 결과가 없습니다",
-      searchSelect: "선택"
+      searchSelect: "선택",
+      sameSurname: "같은 성씨"
     },
     jp: {
       title: "私のK-POP名",
@@ -210,7 +211,8 @@ export default function Home() {
       shareMeta: "推しと同じ苗字の韓国語の名前を作ってみよう!!!!!!😍🎶💖🥰",
       searchResults: "検索結果",
       searchNoResults: "結果が見つかりません",
-      searchSelect: "選択"
+      searchSelect: "選択",
+      sameSurname: "同じ姓"
     },
     th: {
       title: "ชื่อ K-POP ของฉัน",
@@ -237,7 +239,8 @@ export default function Home() {
       shareMeta: "สร้างชื่อเกาหลีที่ใช้นามสกุลเดียวกับเมนของคุณเลย!!!!!!😍🎶💖🥰",
       searchResults: "ผลการค้นหา",
       searchNoResults: "ไม่พบผลลัพธ์",
-      searchSelect: "เลือก"
+      searchSelect: "เลือก",
+      sameSurname: "นามสกุลเดียวกัน"
     },
     es: {
       title: "Mi Nombre K-POP",
@@ -264,7 +267,8 @@ export default function Home() {
       shareMeta: "¡Crea un nombre coreano con el mismo apellido que tu Bias definitivo!!!!!!😍🎶💖🥰",
       searchResults: "Resultados de búsqueda",
       searchNoResults: "No se encontraron resultados",
-      searchSelect: "Seleccionar"
+      searchSelect: "Seleccionar",
+      sameSurname: "Mismo apellido"
     },
     ar: {
       title: "اسم الكيبوب الخاص بي",
@@ -291,7 +295,8 @@ export default function Home() {
       shareMeta: "اصنع اسم كيبوب كوريًا بنفس لقب البايس الخاص بك!!!!!!😍🎶💖🥰",
       searchResults: "نتائج البحث",
       searchNoResults: "لم يتم العثور على نتائج",
-      searchSelect: "اختر"
+      searchSelect: "اختر",
+      sameSurname: "نفس اللقب"
     }
   };
   
@@ -312,13 +317,31 @@ export default function Home() {
     setShowSearchResults(true);
     
     try {
-      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(inputs.idolName)}&entity=song&limit=10`);
+      // 🇰🇷 한국 K-POP 위주로 검색 (KR 스토어 + 음악 + 곡 기준)
+      // 최애 이름으로만 검색하면 다른 국가/장르가 섞일 수 있어 "이름 + kpop" 형태로 검색어를 구성
+      const term = `${inputs.idolName} kpop`;
+      const res = await fetch(
+        `https://itunes.apple.com/search?term=${encodeURIComponent(
+          term
+        )}&entity=song&media=music&country=KR&limit=25`
+      );
       const data = await res.json();
       
       if (data.resultCount > 0) {
         // 아티스트별로 그룹화 (같은 아티스트의 여러 곡 중 첫 번째만)
         const artistMap = new Map();
         data.results.forEach((song: any) => {
+          // 1차: K-POP / 한국 아티스트 우선 필터링
+          const genre = (song.primaryGenreName || '').toLowerCase();
+          const collection = (song.collectionName || '').toLowerCase();
+          const isKoreanKpop =
+            genre.includes('k-pop') ||
+            collection.includes('k-pop') ||
+            collection.includes('korea') ||
+            collection.includes('korean');
+
+          if (!isKoreanKpop) return;
+
           const artistName = song.artistName.toLowerCase();
           if (!artistMap.has(artistName)) {
             artistMap.set(artistName, {
@@ -330,6 +353,24 @@ export default function Home() {
             });
           }
         });
+
+        // 2차: K-POP 필터로 아무 것도 안 남으면, 전체 결과에서 다시 한 번 구성 (fallback)
+        if (artistMap.size === 0) {
+          data.results.forEach((song: any) => {
+            if (!song.previewUrl) return;
+            const artistName = song.artistName.toLowerCase();
+            if (!artistMap.has(artistName)) {
+              artistMap.set(artistName, {
+                artistName: song.artistName,
+                trackName: song.trackName,
+                artworkUrl: song.artworkUrl100.replace('100x100', '600x600'),
+                previewUrl: song.previewUrl,
+                collectionName: song.collectionName || ''
+              });
+            }
+          });
+        }
+
         setSearchResults(Array.from(artistMap.values()));
       } else {
         setSearchResults([]);
@@ -359,10 +400,16 @@ export default function Home() {
     setLoading(true);
     setResult(null);
     
+    // 바로 직전에 나온 한국 이름을 함께 보내서, 같은 이름이 연속으로 나오지 않도록 힌트 제공
+    const payload = {
+      ...inputs,
+      lastKoreanName: result?.korean_name || '',
+    };
+
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
-        body: JSON.stringify(inputs),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       
@@ -613,7 +660,9 @@ export default function Home() {
                             />
                             <div className="flex-1 min-w-0">
                               <p className="text-white font-semibold text-sm truncate">{item.artistName}</p>
-                              <p className="text-gray-400 text-xs truncate">{item.trackName}</p>
+                              <p className="text-gray-400 text-xs truncate">
+                                {item.collectionName || item.trackName}
+                              </p>
                             </div>
                             <span className="text-pink-400 text-xs font-medium px-2 py-1 bg-pink-500/20 rounded">{txt.searchSelect}</span>
                           </motion.button>
@@ -651,13 +700,32 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }} 
                 className="mt-8 pt-8 border-t border-white/10 relative"
               >
-                {idolData.previewUrl && (
-                  <button 
-                    onClick={() => {
-                      if (isPlaying) audioRef.current?.pause();
-                      else audioRef.current?.play();
-                      setIsPlaying(!isPlaying);
-                    }}
+              {idolData.previewUrl && (
+                <button 
+                  onClick={() => {
+                    if (!audioRef.current || !idolData.previewUrl) {
+                      alert('미리듣기 음원을 불러오지 못했어요. 최애를 다시 선택해 주세요.');
+                      return;
+                    }
+                    const audio = audioRef.current;
+                    // 버튼으로 재생할 때도 항상 src 보장
+                    if (!audio.src) {
+                      audio.src = idolData.previewUrl;
+                      audio.currentTime = 0;
+                    }
+                    if (isPlaying) {
+                      audio.pause();
+                      setIsPlaying(false);
+                    } else {
+                      const p = audio.play();
+                      if (p !== undefined) {
+                        p.then(() => setIsPlaying(true)).catch(() => {
+                          alert('브라우저 설정 때문에 자동 재생이 막혔어요. 한 번 더 눌러주세요.');
+                          setIsPlaying(false);
+                        });
+                      }
+                    }
+                  }}
                     className={`absolute top-8 bg-white/10 hover:bg-pink-500/50 p-2 rounded-full transition-colors z-20 ${isRTL ? 'left-0' : 'right-0'}`}
                   >
                     {isPlaying ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
@@ -703,10 +771,27 @@ export default function Home() {
                       <Volume2 className="w-5 h-5 text-pink-300" />
                     </motion.button>
                   </div>
-                  <p className="text-xl text-purple-400 font-medium mb-4">{result.romanized}</p>
+                  <p className="text-xl text-purple-400 font-medium mb-3">{result.romanized}</p>
                   
-                  {/* 최애 정보 표시 */}
-                  <p className="text-sm text-pink-400/80 mb-4">💕 with {inputs.idolName}</p>
+                  {/* 최애 정보 표시 - 같은 성씨 강조 */}
+                  {result.idol_real_name && result.idol_surname ? (
+                    <div className="mb-4 space-y-1">
+                      <p className="text-sm text-pink-400/80">💕 with {inputs.idolName}</p>
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-pink-500/10 border border-pink-500/30 rounded-full">
+                        <span className="text-xs text-pink-300/90 font-semibold">
+                          {txt.sameSurname || "Same Family Name"}:
+                        </span>
+                        <span className="text-sm text-pink-200 font-bold">
+                          {result.idol_surname}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          ({result.idol_real_name})
+                        </span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-pink-400/80 mb-4">💕 with {inputs.idolName}</p>
+                  )}
 
                   <div className={`bg-white/5 rounded-xl p-5 border border-white/5 space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                     <div className="pb-4 border-b border-white/5">

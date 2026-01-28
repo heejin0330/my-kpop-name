@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
   }
 
-  const { userName, userBirthday, userGender, idolName, language } = requestBody;
+  const { userName, userBirthday, userGender, idolName, language, lastKoreanName } = requestBody;
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -99,6 +99,16 @@ export async function POST(req: Request) {
 
   // 사용자 이름이 한글인지 확인
   const isKoreanName = /[가-힣]/.test(userName);
+
+  // 🎨 이름 스타일을 살짝 랜덤하게 바꿔서 다양성 증가
+  const styleOptions = [
+    "fresh, trendy, and idol-like (modern K-POP style)",
+    "soft, warm, and romantic (ballad / vocal line style)",
+    "strong, charismatic, and powerful (performance / dance line style)",
+    "cute, bright, and bubbly (lovely / teen crush concept)",
+    "dreamy, mysterious, and elegant (fantasy / fairy-like concept)",
+  ];
+  const randomStyle = styleOptions[Math.floor(Math.random() * styleOptions.length)];
   
   const prompt = `
     Role: K-POP Naming Expert & Compatibility Fortune Teller.
@@ -109,6 +119,15 @@ export async function POST(req: Request) {
     ${birthdayText ? birthdayText : "Birthday: Not provided"}
     Ultimate Bias: ${idolName}
     Output Language: ${outputLang}
+
+    [NAME STYLE]
+    - The overall vibe of the new name should be: ${randomStyle}.
+    - Even with the same idol and same user, you can choose DIFFERENT given names on different runs.
+    
+    ${lastKoreanName ? `[PREVIOUS NAME TO AVOID]
+    - The last generated Korean name was: "${lastKoreanName}".
+    - DO NOT reuse this exact given name, and avoid names that are too similar in sound or spelling.
+    - Keep the same surname from the idol, but pick a clearly different 2-syllable given name.` : ""}
     
     [COMPATIBILITY SCORE - FIXED]
     Score: ${compatibilityScore}% (USE THIS EXACT NUMBER!)
@@ -117,26 +136,22 @@ export async function POST(req: Request) {
     ⚠️ TASK: Create a NEW Korean name for the user using the idol's REAL surname.
     ${isKoreanName ? "Note: Even though the user already has a Korean name, create a COMPLETELY NEW name with the idol's surname!" : ""}
     
-    ⚠️ IDOL SURNAME LOOKUP (CRITICAL):
-    - G-Dragon/지드래곤 → 권지용 → 권 (Kwon)
-    - RM → 김남준 → 김 (Kim)
-    - V/뷔 → 김태형 → 김 (Kim)
-    - Jennie/제니 → 김제니 → 김 (Kim)
-    - IU/아이유 → 이지은 → 이 (Lee)
-    - Jungkook/정국 → 전정국 → 전 (Jeon)
-    - Taeyeon/태연 → 김태연 → 김 (Kim)
-    - Suzy/수지 → 배수지 → 배 (Bae)
-    - Lisa/리사 (Thai) → Use 노 (Noh) or similar
-    
+    ⚠️ IDOL SURNAME LOOKUP (CRITICAL, MUST MATCH USER'S BIAS ONLY):
+    - You MUST look up the REAL Korean name and surname for the idol given as "Ultimate Bias: ${idolName}".
+    - You are FORBIDDEN to use the real name or surname of any other idol (for example: V/김태형, RM/김남준, Jungkook/전정국, Jennie/김제니 등은 ${idolName}이 아닐 때 절대 사용하지 말 것).
+    - \"idol_real_name\" MUST be the real full Korean name of ${idolName} ONLY.
+    - \"idol_surname\" MUST be the first syllable (family name) of that exact real Korean name.
+
     RULES:
-    1. Find the idol's REAL Korean surname first
+    1. Find the idol's REAL Korean surname for "${idolName}" only (do NOT mix with any other idol).
     2. Create a 2-syllable given name (총 3글자: 성 1자 + 이름 2자)
+       - The VERY FIRST character of "korean_name" MUST be exactly the same as "idol_surname".
     3. Given name should be modern, beautiful, and fit ${userGender}
     4. compatibility_score MUST be exactly "${compatibilityScore}"
     ${zodiacInfo.sign ? `5. Mention ${zodiacInfo.sign} zodiac in compatibility_reason` : ""}
     
-    OUTPUT FORMAT (JSON only, no markdown):
-    {"korean_name":"성이름","romanized":"Seong Ireum","compatibility_score":"${compatibilityScore}","compatibility_reason":"reason in ${outputLang}","meaning":"meaning in ${outputLang}"}
+    OUTPUT FORMAT (JSON only, no markdown, no explanation text around it):
+    {"korean_name":"성이름","romanized":"Seong Ireum","compatibility_score":"${compatibilityScore}","compatibility_reason":"reason in ${outputLang}","meaning":"meaning in ${outputLang}","idol_real_name":"${idolName}의 실제 한국 이름","idol_surname":"그 한국 이름에서의 성씨 1글자"}
   `;
 
   // 순차적 연결 시도 로직
@@ -151,10 +166,11 @@ export async function POST(req: Request) {
         body: JSON.stringify({ 
           contents: [{ parts: [{ text: prompt }] }],
           generationConfig: {
-            temperature: 0.7,      // 더 일관된 결과를 위해 낮춤
-            maxOutputTokens: 512,  // 간결한 응답
-            topP: 0.9,
-            topK: 40,
+            // 조금 더 다양한 이름이 나오도록 살짝 올림
+            temperature: 0.9,
+            maxOutputTokens: 512,
+            topP: 0.95,
+            topK: 50,
           }
         })
       });
@@ -167,7 +183,18 @@ export async function POST(req: Request) {
         const textResponse = data.candidates[0].content.parts[0].text;
         const jsonStr = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         console.log(`Success with model: ${model}`);
-        return NextResponse.json(JSON.parse(jsonStr));
+        
+        const parsed = JSON.parse(jsonStr);
+
+        // ✅ 안전장치: idol_surname과 korean_name의 첫 글자가 다르면 강제로 맞춰줌
+        if (parsed?.idol_surname && parsed?.korean_name) {
+          const surnameChar = String(parsed.idol_surname).trim()[0];
+          if (surnameChar && parsed.korean_name[0] !== surnameChar) {
+            parsed.korean_name = surnameChar + parsed.korean_name.slice(1);
+          }
+        }
+
+        return NextResponse.json(parsed);
       }
       
       console.warn(`Model ${model} failed:`, data.error?.message || 'No valid response');
