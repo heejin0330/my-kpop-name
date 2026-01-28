@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import html2canvas from 'html2canvas';
@@ -11,6 +11,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [idolData, setIdolData] = useState({ image: '', track: '', previewUrl: '' });
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [searching, setSearching] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   
@@ -19,6 +22,8 @@ export default function Home() {
   const dayRef = useRef<HTMLInputElement>(null);
   const genderRef = useRef<HTMLSelectElement>(null);
   const resultCardRef = useRef<HTMLDivElement>(null);
+  const searchResultsRef = useRef<HTMLDivElement>(null);
+  const idolInputRef = useRef<HTMLInputElement>(null);
   
   // 생일 입력 핸들러 (자동 다음 필드 이동)
   const handleBirthdayChange = (field: 'year' | 'month' | 'day', value: string) => {
@@ -43,6 +48,26 @@ export default function Home() {
       genderRef.current?.focus();
     }
   };
+
+  // 외부 클릭 시 검색 결과 닫기
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        showSearchResults &&
+        searchResultsRef.current &&
+        !searchResultsRef.current.contains(event.target as Node) &&
+        idolInputRef.current &&
+        !idolInputRef.current.contains(event.target as Node)
+      ) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showSearchResults]);
 
   // 📸 이미지로 저장하기 (인스타그램 공유용)
   const downloadAsImage = async () => {
@@ -126,7 +151,11 @@ export default function Home() {
       shareTitle: "Share Result",
       shareDownload: "Save Image",
       shareCopy: "Copy",
-      shareAlert: "Copied to clipboard!"
+      shareAlert: "Copied to clipboard!",
+      // 검색
+      searchResults: "Search Results",
+      searchNoResults: "No results found",
+      searchSelect: "Select"
     },
     ko: { 
       title: "나의 케이팝 이름", 
@@ -149,7 +178,10 @@ export default function Home() {
       shareTitle: "결과 공유하기",
       shareDownload: "이미지 저장",
       shareCopy: "복사",
-      shareAlert: "클립보드에 복사되었습니다!"
+      shareAlert: "클립보드에 복사되었습니다!",
+      searchResults: "검색 결과",
+      searchNoResults: "검색 결과가 없습니다",
+      searchSelect: "선택"
     },
     jp: {
       title: "私のK-POP名",
@@ -172,7 +204,10 @@ export default function Home() {
       shareTitle: "結果をシェア",
       shareDownload: "画像保存",
       shareCopy: "コピー",
-      shareAlert: "コピーしました！"
+      shareAlert: "コピーしました！",
+      searchResults: "検索結果",
+      searchNoResults: "結果が見つかりません",
+      searchSelect: "選択"
     },
     th: {
       title: "ชื่อ K-POP ของฉัน",
@@ -195,7 +230,10 @@ export default function Home() {
       shareTitle: "แชร์ผลลัพธ์",
       shareDownload: "บันทึกรูป",
       shareCopy: "คัดลอก",
-      shareAlert: "คัดลอกแล้ว!"
+      shareAlert: "คัดลอกแล้ว!",
+      searchResults: "ผลการค้นหา",
+      searchNoResults: "ไม่พบผลลัพธ์",
+      searchSelect: "เลือก"
     },
     es: {
       title: "Mi Nombre K-POP",
@@ -218,7 +256,10 @@ export default function Home() {
       shareTitle: "Compartir resultado",
       shareDownload: "Guardar imagen",
       shareCopy: "Copiar",
-      shareAlert: "¡Copiado!"
+      shareAlert: "¡Copiado!",
+      searchResults: "Resultados de búsqueda",
+      searchNoResults: "No se encontraron resultados",
+      searchSelect: "Seleccionar"
     },
     ar: {
       title: "اسم الكيبوب الخاص بي",
@@ -241,7 +282,10 @@ export default function Home() {
       shareTitle: "مشاركة النتيجة",
       shareDownload: "حفظ الصورة",
       shareCopy: "نسخ",
-      shareAlert: "تم النسخ!"
+      shareAlert: "تم النسخ!",
+      searchResults: "نتائج البحث",
+      searchNoResults: "لم يتم العثور على نتائج",
+      searchSelect: "اختر"
     }
   };
   
@@ -250,20 +294,58 @@ export default function Home() {
   // 아랍어일 경우 RTL(오른쪽 정렬) 적용
   const isRTL = inputs.language === 'ar';
 
-  const fetchIdolData = async () => {
-    if (inputs.idolName.length < 2) return;
+  // 🔍 최애 검색 (여러 결과 표시)
+  const searchIdol = async () => {
+    if (inputs.idolName.length < 2) {
+      setSearchResults([]);
+      setShowSearchResults(false);
+      return;
+    }
+    
+    setSearching(true);
+    setShowSearchResults(true);
+    
     try {
-      const res = await fetch(`https://itunes.apple.com/search?term=${inputs.idolName}&entity=song&limit=1`);
+      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(inputs.idolName)}&entity=song&limit=10`);
       const data = await res.json();
+      
       if (data.resultCount > 0) {
-        const song = data.results[0];
-        setIdolData({
-          image: song.artworkUrl100.replace('100x100', '600x600'),
-          track: `${song.trackName} - ${song.artistName}`,
-          previewUrl: song.previewUrl
+        // 아티스트별로 그룹화 (같은 아티스트의 여러 곡 중 첫 번째만)
+        const artistMap = new Map();
+        data.results.forEach((song: any) => {
+          const artistName = song.artistName.toLowerCase();
+          if (!artistMap.has(artistName)) {
+            artistMap.set(artistName, {
+              artistName: song.artistName,
+              trackName: song.trackName,
+              artworkUrl: song.artworkUrl100.replace('100x100', '600x600'),
+              previewUrl: song.previewUrl,
+              collectionName: song.collectionName || ''
+            });
+          }
         });
+        setSearchResults(Array.from(artistMap.values()));
+      } else {
+        setSearchResults([]);
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      console.error('Search error:', e);
+      setSearchResults([]);
+    } finally {
+      setSearching(false);
+    }
+  };
+
+  // ✅ 최애 선택
+  const selectIdol = (selected: any) => {
+    setIdolData({
+      image: selected.artworkUrl,
+      track: `${selected.trackName} - ${selected.artistName}`,
+      previewUrl: selected.previewUrl
+    });
+    setInputs({ ...inputs, idolName: selected.artistName });
+    setShowSearchResults(false);
+    setSearchResults([]);
   };
 
   const generateName = async () => {
@@ -466,15 +548,84 @@ export default function Home() {
                   <div className={`absolute top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-gray-800 border-2 border-pink-500/50 bg-cover bg-center transition-all ${idolData.image ? 'opacity-100' : 'opacity-0'} ${isRTL ? 'right-3' : 'left-3'}`} 
                        style={{ backgroundImage: `url(${idolData.image})` }} />
                   <input 
+                    ref={idolInputRef}
                     type="text" 
                     placeholder={txt.phBias}
+                    value={inputs.idolName}
                     className={`w-full bg-white/5 border border-white/10 rounded-xl p-4 text-white placeholder-gray-600 focus:outline-none focus:border-pink-500 transition-all ${idolData.image ? (isRTL ? 'pr-16' : 'pl-16') : (isRTL ? 'pr-4' : 'pl-4')}`}
-                    onChange={(e) => setInputs({...inputs, idolName: e.target.value})}
-                    onBlur={fetchIdolData}
-                    onKeyDown={(e) => e.key === 'Enter' && fetchIdolData()}
+                    onChange={(e) => {
+                      setInputs({...inputs, idolName: e.target.value});
+                      if (e.target.value.length >= 2) {
+                        searchIdol();
+                      } else {
+                        setSearchResults([]);
+                        setShowSearchResults(false);
+                      }
+                    }}
+                    onFocus={() => {
+                      if (inputs.idolName.length >= 2) {
+                        searchIdol();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && searchResults.length > 0) {
+                        selectIdol(searchResults[0]);
+                      }
+                    }}
                   />
-                  <Search className={`absolute top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 ${isRTL ? 'left-4' : 'right-4'}`} />
+                  {searching ? (
+                    <Loader2 className={`absolute top-1/2 -translate-y-1/2 animate-spin text-pink-500 w-4 h-4 ${isRTL ? 'left-4' : 'right-4'}`} />
+                  ) : (
+                    <Search className={`absolute top-1/2 -translate-y-1/2 text-gray-600 w-4 h-4 ${isRTL ? 'left-4' : 'right-4'}`} />
+                  )}
                 </div>
+                
+                {/* 검색 결과 리스트 */}
+                <AnimatePresence>
+                  {showSearchResults && searchResults.length > 0 && (
+                    <motion.div
+                      ref={searchResultsRef}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-lg border border-pink-500/30 rounded-xl shadow-2xl z-50 max-h-64 overflow-y-auto"
+                    >
+                      <div className="p-2">
+                        <p className="text-xs text-pink-400/80 px-3 py-2 font-semibold">{txt.searchResults}</p>
+                        {searchResults.map((item, idx) => (
+                          <motion.button
+                            key={idx}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => selectIdol(item)}
+                            className="w-full flex items-center gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors text-left"
+                          >
+                            <img 
+                              src={item.artworkUrl.replace('600x600', '100x100')} 
+                              alt={item.artistName}
+                              className="w-12 h-12 rounded-lg object-cover"
+                            />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-semibold text-sm truncate">{item.artistName}</p>
+                              <p className="text-gray-400 text-xs truncate">{item.trackName}</p>
+                            </div>
+                            <span className="text-pink-400 text-xs font-medium px-2 py-1 bg-pink-500/20 rounded">{txt.searchSelect}</span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                
+                {showSearchResults && searchResults.length === 0 && !searching && inputs.idolName.length >= 2 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="absolute top-full left-0 right-0 mt-2 bg-gray-900/95 backdrop-blur-lg border border-gray-700/50 rounded-xl p-4 text-center text-gray-400 text-sm z-50"
+                  >
+                    {txt.searchNoResults}
+                  </motion.div>
+                )}
               </div>
             </div>
 
