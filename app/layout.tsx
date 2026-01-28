@@ -15,7 +15,16 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'K-POP Name Generator',
-  description: 'Discover your unique K-POP idol name with our stylish generator',
+  description: 'Make a Korean name with the same family name as your ultimate bias!!!!!!😍🎶💖🥰',
+  openGraph: {
+    title: 'K-POP Name Generator',
+    description: 'Make a Korean name with the same family name as your ultimate bias!!!!!!😍🎶💖🥰',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'K-POP Name Generator',
+    description: 'Make a Korean name with the same family name as your ultimate bias!!!!!!😍🎶💖🥰',
+  },
   generator: 'v0.app',
   icons: {
     icon: [

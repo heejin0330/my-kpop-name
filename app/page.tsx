@@ -94,7 +94,7 @@ export default function Home() {
   const copyToClipboard = async () => {
     if (!result) return;
     
-    const text = `✨ My K-POP Name ✨\n\n이름: ${result.korean_name} (${result.romanized})\n💕 궁합: ${result.compatibility_score}%\n🔥 ${result.compatibility_reason}\n\n#MyKpopName #${inputs.idolName.replace(/\s/g, '')}`;
+    const text = `${txt.shareMeta}\n\n✨ ${txt.title} ✨\n\n${result.korean_name} (${result.romanized})\n${txt.resScore}: ${result.compatibility_score}%\n${txt.resReason}: ${result.compatibility_reason}\n\n#MyKpopName #${inputs.idolName.replace(/\s/g, '')}`;
     
     try {
       await navigator.clipboard.writeText(text);
@@ -109,8 +109,8 @@ export default function Home() {
     if (!result) return;
     
     const shareData = {
-      title: 'My K-POP Name',
-      text: `나의 K-POP 이름은 ${result.korean_name}! 최애 ${inputs.idolName}와(과) 궁합 ${result.compatibility_score}%`,
+      title: txt.title,
+      text: `${txt.shareMeta}\n\n${result.korean_name} (${result.romanized}) - ${txt.resScore}: ${result.compatibility_score}%`,
       url: window.location.href,
     };
     
@@ -152,6 +152,7 @@ export default function Home() {
       shareDownload: "Save Image",
       shareCopy: "Copy",
       shareAlert: "Copied to clipboard!",
+      shareMeta: "Make a Korean name with the same family name as your ultimate bias!!!!!!😍🎶💖🥰",
       // 검색
       searchResults: "Search Results",
       searchNoResults: "No results found",
@@ -179,6 +180,7 @@ export default function Home() {
       shareDownload: "이미지 저장",
       shareCopy: "복사",
       shareAlert: "클립보드에 복사되었습니다!",
+      shareMeta: "당신의 최애와 같은 성을 가진 한국 이름을 만들어 보세요!!!!!!😍🎶💖🥰",
       searchResults: "검색 결과",
       searchNoResults: "검색 결과가 없습니다",
       searchSelect: "선택"
@@ -205,6 +207,7 @@ export default function Home() {
       shareDownload: "画像保存",
       shareCopy: "コピー",
       shareAlert: "コピーしました！",
+      shareMeta: "推しと同じ苗字の韓国語の名前を作ってみよう!!!!!!😍🎶💖🥰",
       searchResults: "検索結果",
       searchNoResults: "結果が見つかりません",
       searchSelect: "選択"
@@ -231,6 +234,7 @@ export default function Home() {
       shareDownload: "บันทึกรูป",
       shareCopy: "คัดลอก",
       shareAlert: "คัดลอกแล้ว!",
+      shareMeta: "สร้างชื่อเกาหลีที่ใช้นามสกุลเดียวกับเมนของคุณเลย!!!!!!😍🎶💖🥰",
       searchResults: "ผลการค้นหา",
       searchNoResults: "ไม่พบผลลัพธ์",
       searchSelect: "เลือก"
@@ -257,6 +261,7 @@ export default function Home() {
       shareDownload: "Guardar imagen",
       shareCopy: "Copiar",
       shareAlert: "¡Copiado!",
+      shareMeta: "¡Crea un nombre coreano con el mismo apellido que tu Bias definitivo!!!!!!😍🎶💖🥰",
       searchResults: "Resultados de búsqueda",
       searchNoResults: "No se encontraron resultados",
       searchSelect: "Seleccionar"
@@ -283,6 +288,7 @@ export default function Home() {
       shareDownload: "حفظ الصورة",
       shareCopy: "نسخ",
       shareAlert: "تم النسخ!",
+      shareMeta: "اصنع اسم كيبوب كوريًا بنفس لقب البايس الخاص بك!!!!!!😍🎶💖🥰",
       searchResults: "نتائج البحث",
       searchNoResults: "لم يتم العثور على نتائج",
       searchSelect: "اختر"
