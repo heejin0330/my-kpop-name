@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Mic } from 'lucide-react';
+import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import html2canvas from 'html2canvas';
 
 export default function Home() {
   const [inputs, setInputs] = useState({ userName: '', userBirthday: '', userGender: 'Female', idolName: '', language: 'en' });
@@ -17,6 +18,7 @@ export default function Home() {
   const monthRef = useRef<HTMLInputElement>(null);
   const dayRef = useRef<HTMLInputElement>(null);
   const genderRef = useRef<HTMLSelectElement>(null);
+  const resultCardRef = useRef<HTMLDivElement>(null);
   
   // 생일 입력 핸들러 (자동 다음 필드 이동)
   const handleBirthdayChange = (field: 'year' | 'month' | 'day', value: string) => {
@@ -42,6 +44,62 @@ export default function Home() {
     }
   };
 
+  // 📸 이미지로 저장하기 (인스타그램 공유용)
+  const downloadAsImage = async () => {
+    if (!resultCardRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(resultCardRef.current, {
+        backgroundColor: '#0a0a0a',
+        scale: 2, // 고화질
+        useCORS: true,
+        logging: false,
+      });
+      
+      const link = document.createElement('a');
+      link.download = `my-kpop-name-${result.korean_name}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      console.error('Image download failed:', err);
+    }
+  };
+
+  // 📋 텍스트 복사하기
+  const copyToClipboard = async () => {
+    if (!result) return;
+    
+    const text = `✨ My K-POP Name ✨\n\n이름: ${result.korean_name} (${result.romanized})\n💕 궁합: ${result.compatibility_score}%\n🔥 ${result.compatibility_reason}\n\n#MyKpopName #${inputs.idolName.replace(/\s/g, '')}`;
+    
+    try {
+      await navigator.clipboard.writeText(text);
+      alert(txt.shareAlert || 'Copied!');
+    } catch (err) {
+      console.error('Copy failed:', err);
+    }
+  };
+
+  // 📤 네이티브 공유 (모바일)
+  const shareResult = async () => {
+    if (!result) return;
+    
+    const shareData = {
+      title: 'My K-POP Name',
+      text: `나의 K-POP 이름은 ${result.korean_name}! 최애 ${inputs.idolName}와(과) 궁합 ${result.compatibility_score}%`,
+      url: window.location.href,
+    };
+    
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err) {
+        console.log('Share cancelled');
+      }
+    } else {
+      copyToClipboard();
+    }
+  };
+
   // 📝 6개 국어 완벽 번역 데이터 (질문 + 버튼 + 결과 라벨 + 플레이스홀더)
   const t: any = {
     en: { 
@@ -63,7 +121,12 @@ export default function Home() {
       resMeaning: "Name Meaning",
       // 하단 안내
       footerPrivacy: "This service does not store any personal information entered.",
-      footerDesc: "This service uses AI to create Korean names with the same surname as your ultimate bias."
+      footerDesc: "This service uses AI to create Korean names with the same surname as your ultimate bias.",
+      // 공유
+      shareTitle: "Share Result",
+      shareDownload: "Save Image",
+      shareCopy: "Copy",
+      shareAlert: "Copied to clipboard!"
     },
     ko: { 
       title: "나의 케이팝 이름", 
@@ -82,7 +145,11 @@ export default function Home() {
       resReason: "우리가 천생연분인 이유 🔥",
       resMeaning: "이름의 뜻",
       footerPrivacy: "본 서비스는 입력된 개인 정보를 저장하지 않습니다.",
-      footerDesc: "본 서비스는 AI를 활용하여 최애의 성과 같은 성으로 한국 이름을 지어주는 서비스입니다."
+      footerDesc: "본 서비스는 AI를 활용하여 최애의 성과 같은 성으로 한국 이름을 지어주는 서비스입니다.",
+      shareTitle: "결과 공유하기",
+      shareDownload: "이미지 저장",
+      shareCopy: "복사",
+      shareAlert: "클립보드에 복사되었습니다!"
     },
     jp: {
       title: "私のK-POP名",
@@ -101,7 +168,11 @@ export default function Home() {
       resReason: "相性抜群の理由 🔥",
       resMeaning: "名前の意味",
       footerPrivacy: "本サービスは入力された個人情報を保存しません。",
-      footerDesc: "本サービスはAIを活用して、推しと同じ苗字の韓国名を作成するサービスです。"
+      footerDesc: "本サービスはAIを活用して、推しと同じ苗字の韓国名を作成するサービスです。",
+      shareTitle: "結果をシェア",
+      shareDownload: "画像保存",
+      shareCopy: "コピー",
+      shareAlert: "コピーしました！"
     },
     th: {
       title: "ชื่อ K-POP ของฉัน",
@@ -120,7 +191,11 @@ export default function Home() {
       resReason: "ทำไมถึงเข้ากันได้ดี? 🔥",
       resMeaning: "ความหมายของชื่อ",
       footerPrivacy: "บริการนี้ไม่เก็บข้อมูลส่วนบุคคลที่ป้อน",
-      footerDesc: "บริการนี้ใช้ AI เพื่อสร้างชื่อเกาหลีที่มีนามสกุลเดียวกับเมนของคุณ"
+      footerDesc: "บริการนี้ใช้ AI เพื่อสร้างชื่อเกาหลีที่มีนามสกุลเดียวกับเมนของคุณ",
+      shareTitle: "แชร์ผลลัพธ์",
+      shareDownload: "บันทึกรูป",
+      shareCopy: "คัดลอก",
+      shareAlert: "คัดลอกแล้ว!"
     },
     es: {
       title: "Mi Nombre K-POP",
@@ -139,7 +214,11 @@ export default function Home() {
       resReason: "¿Por qué hacemos match? 🔥",
       resMeaning: "Significado del nombre",
       footerPrivacy: "Este servicio no almacena ninguna información personal ingresada.",
-      footerDesc: "Este servicio utiliza IA para crear nombres coreanos con el mismo apellido que tu Bias."
+      footerDesc: "Este servicio utiliza IA para crear nombres coreanos con el mismo apellido que tu Bias.",
+      shareTitle: "Compartir resultado",
+      shareDownload: "Guardar imagen",
+      shareCopy: "Copiar",
+      shareAlert: "¡Copiado!"
     },
     ar: {
       title: "اسم الكيبوب الخاص بي",
@@ -158,7 +237,11 @@ export default function Home() {
       resReason: "لماذا هذا التوافق؟ 🔥",
       resMeaning: "معنى الاسم",
       footerPrivacy: "هذه الخدمة لا تخزن أي معلومات شخصية تم إدخالها.",
-      footerDesc: "تستخدم هذه الخدمة الذكاء الاصطناعي لإنشاء أسماء كورية بنفس لقب البايس الخاص بك."
+      footerDesc: "تستخدم هذه الخدمة الذكاء الاصطناعي لإنشاء أسماء كورية بنفس لقب البايس الخاص بك.",
+      shareTitle: "مشاركة النتيجة",
+      shareDownload: "حفظ الصورة",
+      shareCopy: "نسخ",
+      shareAlert: "تم النسخ!"
     }
   };
   
@@ -424,7 +507,10 @@ export default function Home() {
                   </button>
                 )}
 
-                <div className="text-center relative z-10">
+                {/* 캡처용 결과 카드 */}
+                <div ref={resultCardRef} className="text-center relative z-10 bg-[#0a0a0a] p-6 rounded-2xl">
+                  <p className="text-[10px] text-gray-500 mb-3 font-semibold tracking-wider">✨ MY K-POP NAME ✨</p>
+                  
                   <motion.div 
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -460,7 +546,10 @@ export default function Home() {
                       <Volume2 className="w-5 h-5 text-pink-300" />
                     </motion.button>
                   </div>
-                  <p className="text-xl text-purple-400 font-medium mb-6">{result.romanized}</p>
+                  <p className="text-xl text-purple-400 font-medium mb-4">{result.romanized}</p>
+                  
+                  {/* 최애 정보 표시 */}
+                  <p className="text-sm text-pink-400/80 mb-4">💕 with {inputs.idolName}</p>
 
                   <div className={`bg-white/5 rounded-xl p-5 border border-white/5 space-y-4 ${isRTL ? 'text-right' : 'text-left'}`}>
                     <div className="pb-4 border-b border-white/5">
@@ -476,6 +565,36 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
+                
+                {/* 공유 버튼 영역 */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-6 flex justify-center gap-3"
+                >
+                  <button
+                    onClick={downloadAsImage}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-500 hover:to-purple-500 text-white text-sm font-semibold rounded-xl transition-all shadow-lg hover:shadow-pink-500/30"
+                  >
+                    <Download className="w-4 h-4" />
+                    {txt.shareDownload}
+                  </button>
+                  
+                  <button
+                    onClick={shareResult}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl border border-white/10 transition-all"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                  
+                  <button
+                    onClick={copyToClipboard}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-xl border border-white/10 transition-all"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
