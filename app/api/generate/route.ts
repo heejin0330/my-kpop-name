@@ -1,6 +1,7 @@
 // app/api/generate/route.ts
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { selectNameCharacters, selectRandomNameCharacters, MONTH_CHARACTERS, DAY_CHARACTERS, LANGUAGE_MAP, type NameCharacter } from './name-characters-db';
 
 // 1️⃣ K-POP 아이돌 데이터베이스 (활동명 & 본명 & 영문명 통합)
 // 모든 키(key)는 소문자, 띄어쓰기 없이 작성 (검색 최적화)
@@ -104,6 +105,287 @@ const IDOL_DB: Record<string, { surname: string; surname_en: string; group: stri
   'giselle': { surname: '김', surname_en: 'Kim', group: 'aespa' }, // 김애리
   'winter': { surname: '김', surname_en: 'Kim', group: 'aespa' }, // 김민정
   'ningning': { surname: '닝', surname_en: 'Ning', group: 'aespa' },
+
+  // ================= (G)I-DLE =================
+  '미연': { surname: '조', surname_en: 'Cho', group: '(G)I-DLE' }, // 조미연
+  '민니': { surname: '니', surname_en: 'Nicha', group: '(G)I-DLE' }, // 니차 욘따라락
+  '소연': { surname: '전', surname_en: 'Jeon', group: '(G)I-DLE' }, // 전소연
+  '슈화': { surname: '예', surname_en: 'Ye', group: '(G)I-DLE' }, // 예슈화
+  '우기': { surname: '송', surname_en: 'Song', group: '(G)I-DLE' }, // 송우기
+
+  // ================= ATEEZ =================
+  '민기': { surname: '송', surname_en: 'Song', group: 'ATEEZ' }, // 송민기
+  '산': { surname: '최', surname_en: 'Choi', group: 'ATEEZ' }, // 최산
+  '성화': { surname: '박', surname_en: 'Park', group: 'ATEEZ' }, // 박성화
+  '여상': { surname: '강', surname_en: 'Kang', group: 'ATEEZ' }, // 강여상
+  '우영': { surname: '정', surname_en: 'Jung', group: 'ATEEZ' }, // 정우영
+  '윤호': { surname: '정', surname_en: 'Jung', group: 'ATEEZ' }, // 정윤호
+  '종호': { surname: '최', surname_en: 'Choi', group: 'ATEEZ' }, // 최종호
+  '홍중': { surname: '김', surname_en: 'Kim', group: 'ATEEZ' }, // 김홍중
+
+  // ================= BABYMONSTER =================
+  '라미': { surname: '신', surname_en: 'Shin', group: 'BABYMONSTER' }, // 신하람
+  '로라': { surname: '이', surname_en: 'Lee', group: 'BABYMONSTER' }, // 이다인
+  '루카': { surname: '카', surname_en: 'Kawai', group: 'BABYMONSTER' }, // 카와이 루카
+  '아사': { surname: '에', surname_en: 'Enami', group: 'BABYMONSTER' }, // 에나미 아사
+  '아현': { surname: '정', surname_en: 'Jung', group: 'BABYMONSTER' }, // 정아현
+  '치키타': { surname: '리', surname_en: 'Lilacha', group: 'BABYMONSTER' }, // 리라차 폰데차피팟
+  '파리타': { surname: '파', surname_en: 'Parita', group: 'BABYMONSTER' }, // 파리타 분팍디트라웰
+
+  // ================= BLACKPINK (블랙핑크) - 추가 =================
+  '로제': { surname: '박', surname_en: 'Park', group: 'BLACKPINK' }, // 박채영
+
+  // ================= BOYNEXTDOOR =================
+  '리우': { surname: '이', surname_en: 'Lee', group: 'BOYNEXTDOOR' }, // 이상혁
+  '명재현': { surname: '명', surname_en: 'Myeong', group: 'BOYNEXTDOOR' }, // 명재현
+  '성호': { surname: '박', surname_en: 'Park', group: 'BOYNEXTDOOR' }, // 박성호
+  '운학': { surname: '김', surname_en: 'Kim', group: 'BOYNEXTDOOR' }, // 김운학
+  '이한': { surname: '김', surname_en: 'Kim', group: 'BOYNEXTDOOR' }, // 김동현
+  '태산': { surname: '한', surname_en: 'Han', group: 'BOYNEXTDOOR' }, // 한동민
+
+  // ================= BTS (방탄소년단) - 추가 =================
+  '슈가': { surname: '민', surname_en: 'Min', group: 'BTS' }, // 민윤기
+  '정국': { surname: '전', surname_en: 'Jeon', group: 'BTS' }, // 전정국
+  '제이홉': { surname: '정', surname_en: 'Jung', group: 'BTS' }, // 정호석
+
+  // ================= DAY6 =================
+  'youngk': { surname: '강', surname_en: 'Kang', group: 'DAY6' }, // 강영현
+  '도운': { surname: '윤', surname_en: 'Yoon', group: 'DAY6' }, // 윤도운
+  '성진': { surname: '박', surname_en: 'Park', group: 'DAY6' }, // 박성진
+  '원필': { surname: '김', surname_en: 'Kim', group: 'DAY6' }, // 김원필
+
+  // ================= ENHYPEN =================
+  '니키': { surname: '니', surname_en: 'Nishimura', group: 'ENHYPEN' }, // 니시무라 리키
+  '선우': { surname: '김', surname_en: 'Kim', group: 'ENHYPEN' }, // 김선우
+  '성훈': { surname: '박', surname_en: 'Park', group: 'ENHYPEN' }, // 박성훈
+  '정원': { surname: '양', surname_en: 'Yang', group: 'ENHYPEN' }, // 양정원
+  '제이': { surname: '박', surname_en: 'Park', group: 'ENHYPEN' }, // 박종성
+  '제이크': { surname: '심', surname_en: 'Shim', group: 'ENHYPEN' }, // 심재윤
+  '희승': { surname: '이', surname_en: 'Lee', group: 'ENHYPEN' }, // 이희승
+
+  // ================= EXO =================
+  '디오': { surname: '도', surname_en: 'Do', group: 'EXO' }, // 도경수
+  '백현': { surname: '변', surname_en: 'Byun', group: 'EXO' }, // 변백현
+  '세훈': { surname: '오', surname_en: 'Oh', group: 'EXO' }, // 오세훈
+  '수호': { surname: '김', surname_en: 'Kim', group: 'EXO' }, // 김준면
+  '시우민': { surname: '김', surname_en: 'Kim', group: 'EXO' }, // 김민석
+  '찬열': { surname: '박', surname_en: 'Park', group: 'EXO' }, // 박찬열
+  '첸': { surname: '김', surname_en: 'Kim', group: 'EXO' }, // 김종대
+  '카이': { surname: '김', surname_en: 'Kim', group: 'EXO' }, // 김종인
+
+  // ================= GOT7 =================
+  '마크': { surname: '마', surname_en: 'Mark', group: 'GOT7' }, // 마크 투안
+  '뱀뱀': { surname: '깐', surname_en: 'Kunpimook', group: 'GOT7' }, // 깐삐묵 뿌와꾼
+  '영재': { surname: '최', surname_en: 'Choi', group: 'GOT7' }, // 최영재
+  '유겸': { surname: '김', surname_en: 'Kim', group: 'GOT7' }, // 김유겸
+  '잭슨': { surname: '잭', surname_en: 'Jackson', group: 'GOT7' }, // 잭슨 왕
+  '제이비': { surname: '임', surname_en: 'Im', group: 'GOT7' }, // 임재범
+  '진영': { surname: '박', surname_en: 'Park', group: 'GOT7' }, // 박진영
+
+  // ================= ILLIT =================
+  '모카': { surname: '사', surname_en: 'Sakai', group: 'ILLIT' }, // 사카이 모카
+  '민주': { surname: '박', surname_en: 'Park', group: 'ILLIT' }, // 박민주
+  '원희': { surname: '이', surname_en: 'Lee', group: 'ILLIT' }, // 이원희
+  '윤아': { surname: '노', surname_en: 'Noh', group: 'ILLIT' }, // 노윤아
+  '이로하': { surname: '호', surname_en: 'Hokazono', group: 'ILLIT' }, // 호카조노 이로하
+
+  // ================= ITZY =================
+  '류진': { surname: '신', surname_en: 'Shin', group: 'ITZY' }, // 신류진
+  '리아': { surname: '최', surname_en: 'Choi', group: 'ITZY' }, // 최지수
+  '예지': { surname: '황', surname_en: 'Hwang', group: 'ITZY' }, // 황예지
+  '유나': { surname: '신', surname_en: 'Shin', group: 'ITZY' }, // 신유나
+  '채령': { surname: '이', surname_en: 'Lee', group: 'ITZY' }, // 이채령
+
+  // ================= IVE (아이브) - 추가 =================
+  '가을': { surname: '김', surname_en: 'Kim', group: 'IVE' }, // 김가을
+  '레이': { surname: '나', surname_en: 'Na', group: 'IVE' }, // 나오이 레이
+
+  // ================= KISS OF LIFE =================
+  '나띠': { surname: '안', surname_en: 'Annachaya', group: 'KISS OF LIFE' }, // 안나차야 수완차이
+  '벨': { surname: '심', surname_en: 'Shim', group: 'KISS OF LIFE' }, // 심혜원
+  '쥴리': { surname: '한', surname_en: 'Han', group: 'KISS OF LIFE' }, // 한 쥴리
+  '하늘': { surname: '원', surname_en: 'Won', group: 'KISS OF LIFE' }, // 원하늘
+
+  // ================= Kep1er =================
+  '강예서': { surname: '강', surname_en: 'Kang', group: 'Kep1er' }, // 강예서
+  '김다연': { surname: '김', surname_en: 'Kim', group: 'Kep1er' }, // 김다연
+  '김채현': { surname: '김', surname_en: 'Kim', group: 'Kep1er' }, // 김채현
+  '마시로': { surname: '사', surname_en: 'Sakamoto', group: 'Kep1er' }, // 사카모토 마시로
+  '샤오팅': { surname: '선', surname_en: 'Shen', group: 'Kep1er' }, // 선샤오팅
+  '서영은': { surname: '서', surname_en: 'Seo', group: 'Kep1er' }, // 서영은
+  '최유진': { surname: '최', surname_en: 'Choi', group: 'Kep1er' }, // 최유진
+  '휴닝바히에': { surname: '바', surname_en: 'Bahiyyih', group: 'Kep1er' }, // 바히에 정 휴닝
+  '히카루': { surname: '에', surname_en: 'Ezaki', group: 'Kep1er' }, // 에자키 히카루
+
+  // ================= LE SSERAFIM =================
+  '김채원': { surname: '김', surname_en: 'Kim', group: 'LE SSERAFIM' }, // 김채원
+  '사쿠라': { surname: '미', surname_en: 'Miyawaki', group: 'LE SSERAFIM' }, // 미야와키 사쿠라
+  '카즈하': { surname: '나', surname_en: 'Nakamura', group: 'LE SSERAFIM' }, // 나카무라 카즈하
+  '허윤진': { surname: '허', surname_en: 'Heo', group: 'LE SSERAFIM' }, // 허윤진
+  '홍은채': { surname: '홍', surname_en: 'Hong', group: 'LE SSERAFIM' }, // 홍은채
+
+  // ================= MONSTA X =================
+  '기현': { surname: '유', surname_en: 'Yu', group: 'MONSTA X' }, // 유기현
+  '민혁': { surname: '이', surname_en: 'Lee', group: 'MONSTA X' }, // 이민혁
+  '셔누': { surname: '손', surname_en: 'Son', group: 'MONSTA X' }, // 손현우
+  '아이엠': { surname: '임', surname_en: 'Im', group: 'MONSTA X' }, // 임창균
+  '주헌': { surname: '이', surname_en: 'Lee', group: 'MONSTA X' }, // 이주헌
+  '형원': { surname: '채', surname_en: 'Chae', group: 'MONSTA X' }, // 채형원
+
+  // ================= NCT 127 =================
+  '도영': { surname: '김', surname_en: 'Kim', group: 'NCT 127' }, // 김동영
+  '유타': { surname: '나', surname_en: 'Nakamoto', group: 'NCT 127' }, // 나카모토 유타
+  '재현': { surname: '정', surname_en: 'Jung', group: 'NCT 127' }, // 정윤오
+  '쟈니': { surname: '서', surname_en: 'Seo', group: 'NCT 127' }, // 서영호
+  '정우': { surname: '김', surname_en: 'Kim', group: 'NCT 127' }, // 김정우
+  '태용': { surname: '이', surname_en: 'Lee', group: 'NCT 127' }, // 이태용
+  '태일': { surname: '문', surname_en: 'Moon', group: 'NCT 127' }, // 문태일
+  '해찬': { surname: '이', surname_en: 'Lee', group: 'NCT 127' }, // 이동혁
+
+  // ================= NCT DREAM =================
+  '런쥔': { surname: '황', surname_en: 'Hwang', group: 'NCT DREAM' }, // 황인준
+  '재민': { surname: '나', surname_en: 'Na', group: 'NCT DREAM' }, // 나재민
+  '제노': { surname: '이', surname_en: 'Lee', group: 'NCT DREAM' }, // 이제노
+  '지성': { surname: '박', surname_en: 'Park', group: 'NCT DREAM' }, // 박지성
+  '천러': { surname: '종', surname_en: 'Zhong', group: 'NCT DREAM' }, // 종천러
+
+  // ================= NMIXX =================
+  '규진': { surname: '장', surname_en: 'Jang', group: 'NMIXX' }, // 장규진
+  '릴리': { surname: '릴', surname_en: 'Lily', group: 'NMIXX' }, // 릴리 진 머로우
+  '배이': { surname: '배', surname_en: 'Bae', group: 'NMIXX' }, // 배진솔
+  '설윤': { surname: '설', surname_en: 'Seol', group: 'NMIXX' }, // 설윤아
+  '지우': { surname: '김', surname_en: 'Kim', group: 'NMIXX' }, // 김지우
+  '해원': { surname: '오', surname_en: 'Oh', group: 'NMIXX' }, // 오해원
+
+  // ================= NewJeans (뉴진스) - 추가 =================
+  '다니엘': { surname: '다', surname_en: 'Marsh', group: 'NewJeans' }, // 다니엘 마쉬
+  '혜인': { surname: '이', surname_en: 'Lee', group: 'NewJeans' }, // 이혜인
+
+  // ================= RIIZE =================
+  '성찬': { surname: '정', surname_en: 'Jung', group: 'RIIZE' }, // 정성찬
+  '소희': { surname: '이', surname_en: 'Lee', group: 'RIIZE' }, // 이소희
+  '쇼타로': { surname: '오', surname_en: 'Osaki', group: 'RIIZE' }, // 오사키 쇼타로
+  '앤톤': { surname: '이', surname_en: 'Lee', group: 'RIIZE' }, // 이찬영
+  '원빈': { surname: '박', surname_en: 'Park', group: 'RIIZE' }, // 박원빈
+  '은석': { surname: '송', surname_en: 'Song', group: 'RIIZE' }, // 송은석
+
+  // ================= Red Velvet =================
+  '슬기': { surname: '강', surname_en: 'Kang', group: 'Red Velvet' }, // 강슬기
+  '아이린': { surname: '배', surname_en: 'Bae', group: 'Red Velvet' }, // 배주현
+  '예리': { surname: '김', surname_en: 'Kim', group: 'Red Velvet' }, // 김예림
+  '웬디': { surname: '손', surname_en: 'Son', group: 'Red Velvet' }, // 손승완
+  '조이': { surname: '박', surname_en: 'Park', group: 'Red Velvet' }, // 박수영
+
+  // ================= SEVENTEEN (세븐틴) - 추가 =================
+  '도겸': { surname: '이', surname_en: 'Lee', group: 'SEVENTEEN' }, // 이석민
+  '디노': { surname: '이', surname_en: 'Lee', group: 'SEVENTEEN' }, // 이찬
+  '디에잇': { surname: '서', surname_en: 'Seo', group: 'SEVENTEEN' }, // 서명호
+  '민규': { surname: '김', surname_en: 'Kim', group: 'SEVENTEEN' }, // 김민규
+  '버논': { surname: '최', surname_en: 'Choi', group: 'SEVENTEEN' }, // 최한솔
+  '에스쿱스': { surname: '최', surname_en: 'Choi', group: 'SEVENTEEN' }, // 최승철
+  '우지': { surname: '이', surname_en: 'Lee', group: 'SEVENTEEN' }, // 이지훈
+  '원우': { surname: '전', surname_en: 'Jeon', group: 'SEVENTEEN' }, // 전원우
+  '정한': { surname: '윤', surname_en: 'Yoon', group: 'SEVENTEEN' }, // 윤정한
+  '조슈아': { surname: '홍', surname_en: 'Hong', group: 'SEVENTEEN' }, // 홍지수
+  '준': { surname: '문', surname_en: 'Moon', group: 'SEVENTEEN' }, // 문준휘
+  '호시': { surname: '권', surname_en: 'Kwon', group: 'SEVENTEEN' }, // 권순영
+
+  // ================= SHINee =================
+  '민호': { surname: '최', surname_en: 'Choi', group: 'SHINee' }, // 최민호
+  '온유': { surname: '이', surname_en: 'Lee', group: 'SHINee' }, // 이진기
+  '키': { surname: '김', surname_en: 'Kim', group: 'SHINee' }, // 김기범
+  '태민': { surname: '이', surname_en: 'Lee', group: 'SHINee' }, // 이태민
+
+  // ================= STAYC =================
+  '세은': { surname: '윤', surname_en: 'Yoon', group: 'STAYC' }, // 윤세은
+  '수민': { surname: '배', surname_en: 'Bae', group: 'STAYC' }, // 배수민
+  '시은': { surname: '박', surname_en: 'Park', group: 'STAYC' }, // 박시은
+  '아이사': { surname: '이', surname_en: 'Lee', group: 'STAYC' }, // 이채영
+  '윤': { surname: '심', surname_en: 'Shim', group: 'STAYC' }, // 심자윤
+  '재이': { surname: '장', surname_en: 'Jang', group: 'STAYC' }, // 장예은
+
+  // ================= Stray Kids (스트레이 키즈) - 추가 =================
+  '리노': { surname: '이', surname_en: 'Lee', group: 'Stray Kids' }, // 이민호
+  '승민': { surname: '김', surname_en: 'Kim', group: 'Stray Kids' }, // 김승민
+
+  // ================= THE BOYZ =================
+  '뉴': { surname: '최', surname_en: 'Choi', group: 'THE BOYZ' }, // 최찬희
+  '상연': { surname: '이', surname_en: 'Lee', group: 'THE BOYZ' }, // 이상연
+  '선우': { surname: '김', surname_en: 'Kim', group: 'THE BOYZ' }, // 김선우
+  '에릭': { surname: '손', surname_en: 'Son', group: 'THE BOYZ' }, // 손영재
+  '영훈': { surname: '김', surname_en: 'Kim', group: 'THE BOYZ' }, // 김영훈
+  '제이콥': { surname: '배', surname_en: 'Bae', group: 'THE BOYZ' }, // 배준영
+  '주연': { surname: '이', surname_en: 'Lee', group: 'THE BOYZ' }, // 이주연
+  '주학년': { surname: '주', surname_en: 'Joo', group: 'THE BOYZ' }, // 주학년
+  '케빈': { surname: '문', surname_en: 'Moon', group: 'THE BOYZ' }, // 문형서
+  '큐': { surname: '지', surname_en: 'Ji', group: 'THE BOYZ' }, // 지창민
+  '현재': { surname: '이', surname_en: 'Lee', group: 'THE BOYZ' }, // 이재현
+
+  // ================= TREASURE =================
+  '도영': { surname: '김', surname_en: 'Kim', group: 'TREASURE' }, // 김도영
+  '박정우': { surname: '박', surname_en: 'Park', group: 'TREASURE' }, // 박정우
+  '소정환': { surname: '소', surname_en: 'So', group: 'TREASURE' }, // 소정환
+  '아사히': { surname: '하', surname_en: 'Hamada', group: 'TREASURE' }, // 하마다 아사히
+  '요시': { surname: '카', surname_en: 'Kanemoto', group: 'TREASURE' }, // 카네모토 요시노리
+  '윤재혁': { surname: '윤', surname_en: 'Yoon', group: 'TREASURE' }, // 윤재혁
+  '준규': { surname: '김', surname_en: 'Kim', group: 'TREASURE' }, // 김준규
+  '지훈': { surname: '박', surname_en: 'Park', group: 'TREASURE' }, // 박지훈
+  '최현석': { surname: '최', surname_en: 'Choi', group: 'TREASURE' }, // 최현석
+  '하루토': { surname: '와', surname_en: 'Watanabe', group: 'TREASURE' }, // 와타나베 하루토
+
+  // ================= TWICE =================
+  '나연': { surname: '임', surname_en: 'Im', group: 'TWICE' }, // 임나연
+  '다현': { surname: '김', surname_en: 'Kim', group: 'TWICE' }, // 김다현
+  '모모': { surname: '히', surname_en: 'Hirai', group: 'TWICE' }, // 히라이 모모
+  '미나': { surname: '묘', surname_en: 'Moi', group: 'TWICE' }, // 묘이 미나
+  '사나': { surname: '미', surname_en: 'Minatozaki', group: 'TWICE' }, // 미나토자키 사나
+  '정연': { surname: '유', surname_en: 'Yu', group: 'TWICE' }, // 유정연
+  '지효': { surname: '박', surname_en: 'Park', group: 'TWICE' }, // 박지효
+  '쯔위': { surname: '저', surname_en: 'Zhou', group: 'TWICE' }, // 저우쯔위
+  '채영': { surname: '손', surname_en: 'Son', group: 'TWICE' }, // 손채영
+
+  // ================= TWS =================
+  '경민': { surname: '임', surname_en: 'Im', group: 'TWS' }, // 임경민
+  '도훈': { surname: '최', surname_en: 'Choi', group: 'TWS' }, // 최도훈
+  '신유': { surname: '신', surname_en: 'Shin', group: 'TWS' }, // 신정환
+  '영재': { surname: '최', surname_en: 'Choi', group: 'TWS' }, // 최영재
+  '지훈': { surname: '한', surname_en: 'Han', group: 'TWS' }, // 한지훈
+  '한진': { surname: '한', surname_en: 'Han', group: 'TWS' }, // 한진
+
+  // ================= TXT (투모로우바이투게더) - 추가 =================
+  '범규': { surname: '최', surname_en: 'Choi', group: 'TXT' }, // 최범규
+  '수빈': { surname: '최', surname_en: 'Choi', group: 'TXT' }, // 최수빈
+  '연준': { surname: '최', surname_en: 'Choi', group: 'TXT' }, // 최연준
+  '태현': { surname: '강', surname_en: 'Kang', group: 'TXT' }, // 강태현
+
+  // ================= VIVIZ =================
+  '신비': { surname: '황', surname_en: 'Hwang', group: 'VIVIZ' }, // 황은비
+  '엄지': { surname: '김', surname_en: 'Kim', group: 'VIVIZ' }, // 김예원
+  '은하': { surname: '정', surname_en: 'Jung', group: 'VIVIZ' }, // 정은비
+
+  // ================= ZEROBASEONE =================
+  '김규빈': { surname: '김', surname_en: 'Kim', group: 'ZEROBASEONE' }, // 김규빈
+  '김지웅': { surname: '김', surname_en: 'Kim', group: 'ZEROBASEONE' }, // 김지웅
+  '김태래': { surname: '김', surname_en: 'Kim', group: 'ZEROBASEONE' }, // 김태래
+  '리키': { surname: '션', surname_en: 'Shen', group: 'ZEROBASEONE' }, // 션취안루이
+  '박건욱': { surname: '박', surname_en: 'Park', group: 'ZEROBASEONE' }, // 박건욱
+  '석매튜': { surname: '석', surname_en: 'Seok', group: 'ZEROBASEONE' }, // 석우현
+  '성한빈': { surname: '성', surname_en: 'Sung', group: 'ZEROBASEONE' }, // 성한빈
+  '장하오': { surname: '장', surname_en: 'Jang', group: 'ZEROBASEONE' }, // 장하오
+  '한유진': { surname: '한', surname_en: 'Han', group: 'ZEROBASEONE' }, // 한유진
+
+  // ================= 솔로 =================
+  '아이유': { surname: '이', surname_en: 'Lee', group: 'IU' }, // 이지은
+  '싸이': { surname: '박', surname_en: 'Park', group: 'PSY' }, // 박재상
+  '강다니엘': { surname: '강', surname_en: 'Kang', group: '강다니엘' }, // 강다니엘
+  '권은비': { surname: '권', surname_en: 'Kwon', group: '권은비' }, // 권은비
+  '선미': { surname: '이', surname_en: 'Lee', group: '선미' }, // 이선미
+  '이무진': { surname: '이', surname_en: 'Lee', group: '이무진' }, // 이무진
+  '임영웅': { surname: '임', surname_en: 'Im', group: '임영웅' }, // 임영웅
+  '전소미': { surname: '에', surname_en: 'Ennik', group: '전소미' }, // 에닉 소미 다우마
+  '지코': { surname: '우', surname_en: 'Woo', group: '지코' }, // 우지호
+  '청하': { surname: '김', surname_en: 'Kim', group: '청하' }, // 김찬미
+  '최예나': { surname: '최', surname_en: 'Choi', group: '최예나' }, // 최예나
 };
 
 // 아이돌 이름 정규화 함수 (소문자, 띄어쓰기 제거, 특수문자 처리)
@@ -209,15 +491,33 @@ export async function POST(req: Request) {
   // IDOL_DB에서 성씨 조회
   const idolDbInfo = getIdolSurname(idolName);
   const hasIdolDbInfo = idolDbInfo !== null;
+  
+  // 디버깅: 아이돌 이름과 조회 결과 로깅
+  console.log('🔍 Idol lookup:', {
+    originalIdolName: idolName,
+    normalized: normalizeIdolName(idolName),
+    foundInDB: hasIdolDbInfo,
+    surname: idolDbInfo?.surname,
+    group: idolDbInfo?.group
+  });
 
   // 생일 정보 처리
   let zodiacInfo: { sign: string; element: string } | null = null;
+  let selectedCharacters: { month: NameCharacter; day: NameCharacter } | null = null;
   if (userBirthday) {
     const [year, month, day] = userBirthday.split('-').map(Number);
     zodiacInfo = getZodiacSign(month, day);
+    selectedCharacters = selectNameCharacters(month, day);
+  }
+  // 생일 정보가 없으면 랜덤 선택
+  if (!selectedCharacters) {
+    selectedCharacters = selectRandomNameCharacters();
   }
   const compatibilityScore = calculateCompatibilityScore(userBirthday);
   const birthdayText = userBirthday ? `Birthday: ${userBirthday}${zodiacInfo ? ` (${zodiacInfo.sign} ${zodiacInfo.element})` : ''}` : '';
+  
+  // 언어 코드 매핑
+  const langKey = LANGUAGE_MAP[language.toLowerCase()] || 'en';
 
   // 한국 이름인지 확인
   const isKoreanName = /[가-힣]/.test(userName);
@@ -281,13 +581,16 @@ export async function POST(req: Request) {
     ⚠️ IDOL SURNAME LOOKUP (CRITICAL):
     ${hasIdolDbInfo ? `
     [IDOL DATABASE INFO - USE THIS EXACTLY]
-    - Ultimate Bias: ${idolName}
+    - Ultimate Bias: ${idolName} (${idolDbInfo.group})
+    - This is ${idolDbInfo.group} member "${idolName}" (also known as ${normalizeIdolName(idolName)}).
     - Surname (Korean): ${idolDbInfo.surname}
     - Surname (English): ${idolDbInfo.surname_en}
     - Group: ${idolDbInfo.group}
     - The "idol_surname" MUST be exactly "${idolDbInfo.surname}" (single character).
-    - The "idol_real_name" should be a realistic Korean full name starting with "${idolDbInfo.surname}" (e.g., ${idolDbInfo.surname}${idolName.includes('jimin') ? '지민' : idolName.includes('jungkook') ? '정국' : '민수'}).
-    - DO NOT use any other surname. Use "${idolDbInfo.surname}" ONLY.
+    - The "idol_real_name" MUST be the REAL Korean name of ${idolName} from ${idolDbInfo.group}, starting with "${idolDbInfo.surname}".
+    - IMPORTANT: ${idolName} is NOT Jungkook (전정국/전). ${idolName} is ${idolDbInfo.group} member with surname "${idolDbInfo.surname}".
+    - DO NOT confuse ${idolName} with other ${idolDbInfo.group} members. Use "${idolDbInfo.surname}" ONLY for ${idolName}.
+    - Example: If ${idolName} is "jimin" or "Jimin", the real name is "박지민" (Park Jimin), NOT "전정국" (Jeon Jungkook).
     ` : `
     [AI LOOKUP REQUIRED]
     - For Ultimate Bias: ${idolName}
@@ -309,9 +612,22 @@ export async function POST(req: Request) {
       * Lisa/리사 (Thai) → Use 노 (Noh) or similar
     `}
     
+    [NAME CHARACTERS - MANDATORY FORMAT]
+    ${selectedCharacters ? `
+    - The Korean name MUST be created using these specific characters:
+      * First character (Month): "${selectedCharacters.month.character}" (${selectedCharacters.month.romanized}) - ${selectedCharacters.month.meanings[langKey]}
+      * Second character (Day): "${selectedCharacters.day.character}" (${selectedCharacters.day.romanized}) - ${selectedCharacters.day.meanings[langKey]}
+    - Name format: [Idol's Surname] + "${selectedCharacters.month.character}" + "${selectedCharacters.day.character}"
+    - Example: If idol's surname is "김", the name should be "김${selectedCharacters.month.character}${selectedCharacters.day.character}"
+    - The romanized name should follow: [Surname_English] + "${selectedCharacters.month.romanized}" + "${selectedCharacters.day.romanized}"
+    ` : `
+    - Create a 2-syllable given name using modern Korean characters
+    - You can reference the name character database for inspiration, but you have flexibility in character selection
+    `}
+    
     RULES:
     1. Find the idol's REAL Korean surname first
-    2. Create a 2-syllable given name (총 3글자: 성 1자 + 이름 2자)
+    2. ${selectedCharacters ? `Create the name using EXACTLY these characters: [Surname] + "${selectedCharacters.month.character}" + "${selectedCharacters.day.character}"` : 'Create a 2-syllable given name (총 3글자: 성 1자 + 이름 2자)'}
     3. Given name should be modern, beautiful, and fit ${userGender}
     4. compatibility_score MUST be exactly "${compatibilityScore}"
     ${zodiacInfo?.sign ? `5. Mention ${zodiacInfo.sign} zodiac in compatibility_reason` : ""}
@@ -441,22 +757,66 @@ export async function POST(req: Request) {
       }
       
       if (hasIdolDbInfo && idolDbInfo) {
+        // 강제로 올바른 성씨 설정
         parsedResult.idol_surname = idolDbInfo.surname;
+        
+        // idol_real_name 검증 및 수정
+        const normalized = normalizeIdolName(idolName);
+        const commonNames: Record<string, string> = {
+          'jimin': '지민', 'jungkook': '정국', 'rm': '남준', 'namjoon': '남준',
+          'v': '태형', 'taehyung': '태형', 'jin': '석진', 'seokjin': '석진',
+          'suga': '윤기', 'yoongi': '윤기', 'jhope': '호석', 'hoseok': '호석',
+          // BLACKPINK
+          'jisoo': '지수', 'jennie': '제니', 'rose': '채영', 'rosé': '채영',
+          'chaeyoung': '채영', 'lisa': '리사', 'lalisa': '리사',
+        };
+        const givenName = commonNames[normalized] || '민수';
+        const correctRealName = `${idolDbInfo.surname}${givenName}`;
+        
+        // idol_real_name이 없거나 잘못된 성씨를 사용하면 강제 수정
         if (!parsedResult.idol_real_name || !parsedResult.idol_real_name.startsWith(idolDbInfo.surname)) {
-          const commonNames: Record<string, string> = {
-            'jimin': '지민', 'jungkook': '정국', 'rm': '남준', 'namjoon': '남준',
-            'v': '태형', 'taehyung': '태형', 'jin': '석진', 'seokjin': '석진',
-            'suga': '윤기', 'yoongi': '윤기', 'jhope': '호석', 'hoseok': '호석',
-            // BLACKPINK
-            'jisoo': '지수', 'jennie': '제니', 'rose': '채영', 'rosé': '채영',
-            'chaeyoung': '채영', 'lisa': '리사', 'lalisa': '리사',
-          };
-          const normalized = normalizeIdolName(idolName);
-          const givenName = commonNames[normalized] || '민수';
-          parsedResult.idol_real_name = `${idolDbInfo.surname}${givenName}`;
+          console.warn(`⚠️ Correcting idol_real_name: "${parsedResult.idol_real_name}" → "${correctRealName}" (for ${idolName})`);
+          parsedResult.idol_real_name = correctRealName;
+        } else if (parsedResult.idol_real_name !== correctRealName && commonNames[normalized]) {
+          // 성씨는 맞지만 이름이 다를 수 있으므로 확인
+          console.log(`ℹ️ idol_real_name "${parsedResult.idol_real_name}" seems correct for ${idolName}`);
         }
         if (parsedResult.korean_name && !parsedResult.korean_name.startsWith(idolDbInfo.surname)) {
           parsedResult.korean_name = idolDbInfo.surname + parsedResult.korean_name.substring(1);
+        }
+      }
+      
+      // 선택된 글자 의미 추가 및 이름 검증
+      if (selectedCharacters) {
+        parsedResult.character_meanings = {
+          month: {
+            character: selectedCharacters.month.character,
+            romanized: selectedCharacters.month.romanized,
+            meaning: selectedCharacters.month.meanings[langKey]
+          },
+          day: {
+            character: selectedCharacters.day.character,
+            romanized: selectedCharacters.day.romanized,
+            meaning: selectedCharacters.day.meanings[langKey]
+          }
+        };
+        
+        // 선택된 글자로 이름이 생성되었는지 검증 및 수정
+        if (parsedResult.korean_name && parsedResult.korean_name.length >= 3) {
+          const surname = parsedResult.korean_name.charAt(0);
+          const expectedName = surname + selectedCharacters.month.character + selectedCharacters.day.character;
+          if (parsedResult.korean_name !== expectedName) {
+            console.warn(`⚠️ Name doesn't match selected characters. Expected: ${expectedName}, Got: ${parsedResult.korean_name}. Correcting...`);
+            parsedResult.korean_name = expectedName;
+            // romanized도 수정
+            const surnameEn = hasIdolDbInfo && idolDbInfo ? idolDbInfo.surname_en : 
+                              (parsedResult.idol_surname === '김' ? 'Kim' : 
+                               parsedResult.idol_surname === '이' ? 'Lee' : 
+                               parsedResult.idol_surname === '박' ? 'Park' : 
+                               parsedResult.idol_surname === '최' ? 'Choi' : 
+                               parsedResult.idol_surname === '정' ? 'Jung' : 'Kim');
+            parsedResult.romanized = `${surnameEn} ${selectedCharacters.month.romanized}${selectedCharacters.day.romanized}`;
+          }
         }
       }
       
@@ -536,25 +896,67 @@ export async function POST(req: Request) {
         
         // IDOL_DB에서 찾은 경우, 응답의 성씨를 강제로 DB 값으로 설정
         if (hasIdolDbInfo && idolDbInfo) {
+          // 강제로 올바른 성씨 설정
           parsedResult.idol_surname = idolDbInfo.surname;
-          // idol_real_name이 없거나 성씨가 다르면 생성
+          
+          // idol_real_name 검증 및 수정
+          const normalized = normalizeIdolName(idolName);
+          const commonNames: Record<string, string> = {
+            'jimin': '지민', 'jungkook': '정국', 'rm': '남준', 'namjoon': '남준',
+            'v': '태형', 'taehyung': '태형', 'jin': '석진', 'seokjin': '석진',
+            'suga': '윤기', 'yoongi': '윤기', 'jhope': '호석', 'hoseok': '호석',
+            // BLACKPINK
+            'jisoo': '지수', 'jennie': '제니', 'rose': '채영', 'rosé': '채영',
+            'chaeyoung': '채영', 'lisa': '리사', 'lalisa': '리사',
+          };
+          const givenName = commonNames[normalized] || '민수';
+          const correctRealName = `${idolDbInfo.surname}${givenName}`;
+          
+          // idol_real_name이 없거나 잘못된 성씨를 사용하면 강제 수정
           if (!parsedResult.idol_real_name || !parsedResult.idol_real_name.startsWith(idolDbInfo.surname)) {
-            // 간단한 본명 생성 (예: 박지민, 김남준 등)
-            const commonNames: Record<string, string> = {
-              'jimin': '지민', 'jungkook': '정국', 'rm': '남준', 'namjoon': '남준',
-              'v': '태형', 'taehyung': '태형', 'jin': '석진', 'seokjin': '석진',
-              'suga': '윤기', 'yoongi': '윤기', 'jhope': '호석', 'hoseok': '호석',
-              // BLACKPINK
-              'jisoo': '지수', 'jennie': '제니', 'rose': '채영', 'rosé': '채영',
-              'chaeyoung': '채영', 'lisa': '리사', 'lalisa': '리사',
-            };
-            const normalized = normalizeIdolName(idolName);
-            const givenName = commonNames[normalized] || '민수';
-            parsedResult.idol_real_name = `${idolDbInfo.surname}${givenName}`;
+            console.warn(`⚠️ Correcting idol_real_name: "${parsedResult.idol_real_name}" → "${correctRealName}" (for ${idolName})`);
+            parsedResult.idol_real_name = correctRealName;
+          } else if (parsedResult.idol_real_name !== correctRealName && commonNames[normalized]) {
+            // 성씨는 맞지만 이름이 다를 수 있으므로 확인
+            console.log(`ℹ️ idol_real_name "${parsedResult.idol_real_name}" seems correct for ${idolName}`);
           }
+          
           // 생성된 이름의 성씨도 강제 수정
           if (parsedResult.korean_name && !parsedResult.korean_name.startsWith(idolDbInfo.surname)) {
             parsedResult.korean_name = idolDbInfo.surname + parsedResult.korean_name.substring(1);
+          }
+        }
+        
+        // 선택된 글자 의미 추가
+        if (selectedCharacters) {
+          parsedResult.character_meanings = {
+            month: {
+              character: selectedCharacters.month.character,
+              romanized: selectedCharacters.month.romanized,
+              meaning: selectedCharacters.month.meanings[langKey]
+            },
+            day: {
+              character: selectedCharacters.day.character,
+              romanized: selectedCharacters.day.romanized,
+              meaning: selectedCharacters.day.meanings[langKey]
+            }
+          };
+          
+          // 선택된 글자로 이름이 생성되었는지 검증 및 수정
+          if (parsedResult.korean_name && parsedResult.korean_name.length >= 3) {
+            const expectedName = parsedResult.korean_name.charAt(0) + selectedCharacters.month.character + selectedCharacters.day.character;
+            if (parsedResult.korean_name !== expectedName) {
+              console.warn(`⚠️ Name doesn't match selected characters. Expected: ${expectedName}, Got: ${parsedResult.korean_name}. Correcting...`);
+              parsedResult.korean_name = expectedName;
+              // romanized도 수정
+              const surnameEn = hasIdolDbInfo && idolDbInfo ? idolDbInfo.surname_en : 
+                                (parsedResult.idol_surname === '김' ? 'Kim' : 
+                                 parsedResult.idol_surname === '이' ? 'Lee' : 
+                                 parsedResult.idol_surname === '박' ? 'Park' : 
+                                 parsedResult.idol_surname === '최' ? 'Choi' : 
+                                 parsedResult.idol_surname === '정' ? 'Jung' : 'Kim');
+              parsedResult.romanized = `${surnameEn} ${selectedCharacters.month.romanized}${selectedCharacters.day.romanized}`;
+            }
           }
         }
         

@@ -1,0 +1,168 @@
+﻿node.exe : npm warn exec The following package was not found and will be installed: tsx@4.21.0
+위치 줄:1 문자:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (npm warn exec T...led: tsx@4.21.0:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+// ================= Generated from CSV =================
+
+  // ================= (G)I-DLE =================
+  '誘몄뿰': { surname: '議?, surname_en: 'Cho', group: '(G)I-DLE' }, // 議곕???  '誘쇰땲': { surname: '??, surname_en: '??, group: '(G)I-DLE' }, // ?덉감 ?섎뵲?쇰씫
+  '?뚯뿰': { surname: '??, surname_en: 'Jeon', group: '(G)I-DLE' }, // ?꾩냼??  '?덊솕': { surname: '??, surname_en: 'Ye', group: '(G)I-DLE' }, // ?덉뒋??  '?곌린': { surname: '??, surname_en: 'Song', group: '(G)I-DLE' }, // ?≪슦湲?
+  // ================= ATEEZ =================
+  '誘쇨린': { surname: '??, surname_en: 'Song', group: 'ATEEZ' }, // ?〓?湲?  '??: { surname: '理?, surname_en: 'Choi', group: 'ATEEZ' }, // 理쒖궛
+  '?깊솕': { surname: '諛?, surname_en: 'Park', group: 'ATEEZ' }, // 諛뺤꽦??  '?ъ긽': { surname: '媛?, surname_en: 'Kang', group: 'ATEEZ' }, // 媛뺤뿬??  '?곗쁺': { surname: '??, surname_en: 'Jung', group: 'ATEEZ' }, // ?뺤슦??  '?ㅽ샇': { surname: '??, surname_en: 'Jung', group: 'ATEEZ' }, // ?뺤쑄??  '醫낇샇': { surname: '理?, surname_en: 'Choi', group: 'ATEEZ' }, // 理쒖쥌??  '?띿쨷': { surname: '源', surname_en: 'Kim', group: 'ATEEZ' }, // 源?띿쨷
+
+  // ================= BABYMONSTER =================
+  '?쇰?': { surname: '??, surname_en: 'Shin', group: 'BABYMONSTER' }, // ?좏븯??  '濡쒕씪': { surname: '??, surname_en: 'Lee', group: 'BABYMONSTER' }, // ?대떎??  '猷⑥뭅': { surname: '移?, surname_en: '移?, group: 'BABYMONSTER' }, // 移댁???猷⑥뭅
+  '?꾩궗': { surname: '??, surname_en: '??, group: 'BABYMONSTER' }, // ?먮굹誘??꾩궗
+  '?꾪쁽': { surname: '??, surname_en: 'Jung', group: 'BABYMONSTER' }, // ?뺤븘??  '移섑궎?': { surname: '由?, surname_en: '由?, group: 'BABYMONSTER' }, // 由щ씪李??곕뜲李⑦뵾??  '?뚮━?': { surname: '??, surname_en: '??, group: 'BABYMONSTER' }, // ?뚮━? 遺꾪뙇?뷀듃?쇱쎇
+
+  // ================= BLACKPINK =================
+  '濡쒖젣': { surname: '諛?, surname_en: 'Park', group: 'BLACKPINK' }, // 諛뺤콈??  '由ъ궗': { surname: '??, surname_en: 'La', group: 'BLACKPINK' }, // ?쇰━??留덈끂諛?  '?쒕땲': { surname: '源', surname_en: 'Kim', group: 'BLACKPINK' }, // 源?쒕땲
+  '吏??: { surname: '源', surname_en: 'Kim', group: 'BLACKPINK' }, // 源吏??
+  // ================= BOYNEXTDOOR =================
+  '由ъ슦': { surname: '??, surname_en: 'Lee', group: 'BOYNEXTDOOR' }, // ?댁긽??  '紐낆옱??: { surname: '紐?, surname_en: '紐?, group: 'BOYNEXTDOOR' }, // 紐낆옱??  '?깊샇': { surname: '諛?, surname_en: 'Park', group: 'BOYNEXTDOOR' }, // 諛뺤꽦??  '?댄븰': { surname: '源', surname_en: 'Kim', group: 'BOYNEXTDOOR' }, // 源?댄븰
+  '?댄븳': { surname: '源', surname_en: 'Kim', group: 'BOYNEXTDOOR' }, // 源?숉쁽
+  '?쒖궛': { surname: '??, surname_en: 'Han', group: 'BOYNEXTDOOR' }, // ?쒕룞誘?
+  // ================= BTS =================
+  'rm': { surname: '源', surname_en: 'Kim', group: 'BTS' }, // 源?⑥?
+  'v': { surname: '源', surname_en: 'Kim', group: 'BTS' }, // 源?쒗삎
+  '?덇?': { surname: '誘?, surname_en: 'Min', group: 'BTS' }, // 誘쇱쑄湲?  '?뺢뎅': { surname: '??, surname_en: 'Jeon', group: 'BTS' }, // ?꾩젙援?  '?쒖씠??: { surname: '??, surname_en: 'Jung', group: 'BTS' }, // ?뺥샇??  '吏誘?: { surname: '諛?, surname_en: 'Park', group: 'BTS' }, // 諛뺤?誘?  '吏?: { surname: '源', surname_en: 'Kim', group: 'BTS' }, // 源?앹쭊
+
+  // ================= DAY6 =================
+  'youngk': { surname: '媛?, surname_en: 'Kang', group: 'DAY6' }, // 媛뺤쁺??  '?꾩슫': { surname: '??, surname_en: 'Yoon', group: 'DAY6' }, // ?ㅻ룄??  '?깆쭊': { surname: '諛?, surname_en: 'Park', group: 'DAY6' }, // 諛뺤꽦吏?  '?먰븘': { surname: '源', surname_en: 'Kim', group: 'DAY6' }, // 源?먰븘
+
+  // ================= ENHYPEN =================
+  '?덊궎': { surname: '??, surname_en: '??, group: 'ENHYPEN' }, // ?덉떆臾대씪 由ы궎
+  '?깊썕': { surname: '諛?, surname_en: 'Park', group: 'ENHYPEN' }, // 諛뺤꽦??  '?뺤썝': { surname: '??, surname_en: 'Yang', group: 'ENHYPEN' }, // ?묒젙??  '?쒖씠': { surname: '諛?, surname_en: 'Park', group: 'ENHYPEN' }, // 諛뺤쥌??  '?쒖씠??: { surname: '??, surname_en: 'Shim', group: 'ENHYPEN' }, // ?ъ옱??  '?ъ듅': { surname: '??, surname_en: 'Lee', group: 'ENHYPEN' }, // ?댄씗??
+  // ================= EXO =================
+  '?붿삤': { surname: '??, surname_en: 'Do', group: 'EXO' }, // ?꾧꼍??  '諛깊쁽': { surname: '蹂', surname_en: 'Byun', group: 'EXO' }, // 蹂諛깊쁽
+  '?명썕': { surname: '??, surname_en: 'Oh', group: 'EXO' }, // ?ㅼ꽭??  '?섑샇': { surname: '源', surname_en: 'Kim', group: 'EXO' }, // 源以硫?  '?쒖슦誘?: { surname: '源', surname_en: 'Kim', group: 'EXO' }, // 源誘쇱꽍
+  '李ъ뿴': { surname: '諛?, surname_en: 'Park', group: 'EXO' }, // 諛뺤갔??  '泥?: { surname: '源', surname_en: 'Kim', group: 'EXO' }, // 源醫낅?
+  '移댁씠': { surname: '源', surname_en: 'Kim', group: 'EXO' }, // 源醫낆씤
+
+  // ================= GOT7 =================
+  '諭諭': { surname: '源?, surname_en: '源?, group: 'GOT7' }, // 源먯굪臾?肉뚯?袁?  '?좉껴': { surname: '源', surname_en: 'Kim', group: 'GOT7' }, // 源?좉껴
+  '??뒯': { surname: '??, surname_en: '??, group: 'GOT7' }, // ??뒯 ??  '?쒖씠鍮?: { surname: '??, surname_en: 'Im', group: 'GOT7' }, // ?꾩옱踰?  '吏꾩쁺': { surname: '諛?, surname_en: 'Park', group: 'GOT7' }, // 諛뺤쭊??
+  // ================= ILLIT =================
+  '紐⑥뭅': { surname: '??, surname_en: 'Sa', group: 'ILLIT' }, // ?ъ뭅??紐⑥뭅
+  '誘쇱＜': { surname: '諛?, surname_en: 'Park', group: 'ILLIT' }, // 諛뺣?二?  '?먰씗': { surname: '??, surname_en: 'Lee', group: 'ILLIT' }, // ?댁썝??  '?ㅼ븘': { surname: '??, surname_en: 'Noh', group: 'ILLIT' }, // ?몄쑄??  '?대줈??: { surname: '??, surname_en: '??, group: 'ILLIT' }, // ?몄뭅議곕끂 ?대줈??
+  // ================= ITZY =================
+  '瑜섏쭊': { surname: '??, surname_en: 'Shin', group: 'ITZY' }, // ?좊쪟吏?  '由ъ븘': { surname: '理?, surname_en: 'Choi', group: 'ITZY' }, // 理쒖???  '?덉?': { surname: '??, surname_en: 'Hwang', group: 'ITZY' }, // ?⑹삁吏
+  '?좊굹': { surname: '??, surname_en: 'Shin', group: 'ITZY' }, // ?좎쑀??  '梨꾨졊': { surname: '??, surname_en: 'Lee', group: 'ITZY' }, // ?댁콈??
+  // ================= IU =================
+  '?꾩씠??: { surname: '??, surname_en: 'Lee', group: 'IU' }, // ?댁??
+
+  // ================= IVE =================
+  '媛??: { surname: '源', surname_en: 'Kim', group: 'IVE' }, // 源媛??  '?덉씠': { surname: '??, surname_en: 'Na', group: 'IVE' }, // ?섏삤???덉씠
+  '由ъ쫰': { surname: '源', surname_en: 'Kim', group: 'IVE' }, // 源吏??  '?덉쑀吏?: { surname: '??, surname_en: 'An', group: 'IVE' }, // ?덉쑀吏?  '?댁꽌': { surname: '??, surname_en: 'Lee', group: 'IVE' }, // ?댄쁽??  '?μ썝??: { surname: '??, surname_en: 'Jang', group: 'IVE' }, // ?μ썝??
+  // ================= KISS OF LIFE =================
+  '?섎씈': { surname: '??, surname_en: 'An', group: 'KISS OF LIFE' }, // ?덈굹李⑥빞 ?섏셿李⑥씠
+  '踰?: { surname: '??, surname_en: 'Shim', group: 'KISS OF LIFE' }, // ?ы삙??  '伊대━': { surname: '??, surname_en: 'Han', group: 'KISS OF LIFE' }, // ??伊대━
+  '?섎뒛': { surname: '??, surname_en: 'Won', group: 'KISS OF LIFE' }, // ?먰븯??
+  // ================= Kep1er =================
+  '媛뺤삁??: { surname: '媛?, surname_en: 'Kang', group: 'Kep1er' }, // 媛뺤삁??  '源?ㅼ뿰': { surname: '源', surname_en: 'Kim', group: 'Kep1er' }, // 源?ㅼ뿰
+  '源梨꾪쁽': { surname: '源', surname_en: 'Kim', group: 'Kep1er' }, // 源梨꾪쁽
+  '留덉떆濡?: { surname: '??, surname_en: 'Sa', group: 'Kep1er' }, // ?ъ뭅紐⑦넗 留덉떆濡?  '?ㅼ삤??: { surname: '??, surname_en: '??, group: 'Kep1er' }, // ?좎깶?ㅽ똿
+  '?쒖쁺?': { surname: '??, surname_en: 'Seo', group: 'Kep1er' }, // ?쒖쁺?
+  '理쒖쑀吏?: { surname: '理?, surname_en: 'Choi', group: 'Kep1er' }, // 理쒖쑀吏?  '?대떇諛뷀엳??: { surname: '諛?, surname_en: '諛?, group: 'Kep1er' }, // 諛뷀엳?????대떇
+  '?덉뭅猷?: { surname: '??, surname_en: '??, group: 'Kep1er' }, // ?먯옄???덉뭅猷?
+  // ================= LE SSERAFIM =================
+  '源梨꾩썝': { surname: '源', surname_en: 'Kim', group: 'LE SSERAFIM' }, // 源梨꾩썝
+  '?ъ퓼??: { surname: '誘?, surname_en: '誘?, group: 'LE SSERAFIM' }, // 誘몄빞????ъ퓼??  '移댁쫰??: { surname: '??, surname_en: 'Na', group: 'LE SSERAFIM' }, // ?섏뭅臾대씪 移댁쫰??  '?덉쑄吏?: { surname: '??, surname_en: 'Heo', group: 'LE SSERAFIM' }, // ?덉쑄吏?  '?띿?梨?: { surname: '??, surname_en: 'Hong', group: 'LE SSERAFIM' }, // ?띿?梨?
+  // ================= MONSTA X =================
+  '湲고쁽': { surname: '??, surname_en: 'Yu', group: 'MONSTA X' }, // ?좉린??  '誘쇳쁺': { surname: '??, surname_en: 'Lee', group: 'MONSTA X' }, // ?대???  '?붾늻': { surname: '??, surname_en: 'Son', group: 'MONSTA X' }, // ?먰쁽??  '?꾩씠??: { surname: '??, surname_en: 'Im', group: 'MONSTA X' }, // ?꾩갹洹?  '二쇳뿄': { surname: '??, surname_en: 'Lee', group: 'MONSTA X' }, // ?댁＜??  '?뺤썝': { surname: '梨?, surname_en: '梨?, group: 'MONSTA X' }, // 梨꾪삎??
+  // ================= NCT 127 =================
+  '?좏?': { surname: '??, surname_en: 'Na', group: 'NCT 127' }, // ?섏뭅紐⑦넗 ?좏?
+  '?ы쁽': { surname: '??, surname_en: 'Jung', group: 'NCT 127' }, // ?뺤쑄??  '?덈땲': { surname: '??, surname_en: 'Seo', group: 'NCT 127' }, // ?쒖쁺??  '?뺤슦': { surname: '源', surname_en: 'Kim', group: 'NCT 127' }, // 源?뺤슦
+  '?쒖슜': { surname: '??, surname_en: 'Lee', group: 'NCT 127' }, // ?댄깭??  '?쒖씪': { surname: '臾?, surname_en: 'Moon', group: 'NCT 127' }, // 臾명깭??
+  // ================= NCT DREAM =================
+  '留덊겕': { surname: '??, surname_en: 'Lee', group: 'NCT DREAM' }, // ?대쭏??  '?댁갔': { surname: '??, surname_en: 'Lee', group: 'NCT DREAM' }, // ?대룞??  '?곗쪛': { surname: '??, surname_en: 'Hwang', group: 'NCT DREAM' }, // ?⑹씤以
+  '?щ?': { surname: '??, surname_en: 'Na', group: 'NCT DREAM' }, // ?섏옱誘?  '?쒕끂': { surname: '??, surname_en: 'Lee', group: 'NCT DREAM' }, // ?댁젣??  '吏??: { surname: '諛?, surname_en: 'Park', group: 'NCT DREAM' }, // 諛뺤???  '泥쒕윭': { surname: '醫?, surname_en: 'Jong', group: 'NCT DREAM' }, // 醫낆쿇??
+  // ================= NMIXX =================
+  '洹쒖쭊': { surname: '??, surname_en: 'Jang', group: 'NMIXX' }, // ?κ퇋吏?  '由대━': { surname: '由?, surname_en: '由?, group: 'NMIXX' }, // 由대━ 吏?癒몃줈??  '諛곗씠': { surname: '諛?, surname_en: 'Bae', group: 'NMIXX' }, // 諛곗쭊??  '?ㅼ쑄': { surname: '??, surname_en: '??, group: 'NMIXX' }, // ?ㅼ쑄??  '吏??: { surname: '源', surname_en: 'Kim', group: 'NMIXX' }, // 源吏??  '?댁썝': { surname: '??, surname_en: 'Oh', group: 'NMIXX' }, // ?ㅽ빐??
+  // ================= NewJeans =================
+  '?ㅻ땲??: { surname: '??, surname_en: '??, group: 'NewJeans' }, // ?ㅻ땲??留덉돩
+  '誘쇱?': { surname: '源', surname_en: 'Kim', group: 'NewJeans' }, // 源誘쇱?
+  '?섎땲': { surname: '??, surname_en: 'Pham', group: 'NewJeans' }, // ???섎땲
+  '?대┛': { surname: '媛?, surname_en: 'Kang', group: 'NewJeans' }, // 媛뺥빐由?  '?쒖씤': { surname: '??, surname_en: 'Lee', group: 'NewJeans' }, // ?댄삙??
+  // ================= PSY =================
+  '?몄씠': { surname: '諛?, surname_en: 'Park', group: 'PSY' }, // 諛뺤옱??
+  // ================= RIIZE =================
+  '?깆갔': { surname: '??, surname_en: 'Jung', group: 'RIIZE' }, // ?뺤꽦李?  '?뚰씗': { surname: '??, surname_en: 'Lee', group: 'RIIZE' }, // ?댁냼??  '?쇳?濡?: { surname: '??, surname_en: 'Oh', group: 'RIIZE' }, // ?ㅼ궗???쇳?濡?  '?ㅽ넠': { surname: '??, surname_en: 'Lee', group: 'RIIZE' }, // ?댁갔??  '?먮퉰': { surname: '諛?, surname_en: 'Park', group: 'RIIZE' }, // 諛뺤썝鍮?  '???: { surname: '??, surname_en: 'Song', group: 'RIIZE' }, // ?≪???
+  // ================= Red Velvet =================
+  '?ш린': { surname: '媛?, surname_en: 'Kang', group: 'Red Velvet' }, // 媛뺤뒳湲?  '?꾩씠由?: { surname: '諛?, surname_en: 'Bae', group: 'Red Velvet' }, // 諛곗＜??  '?덈━': { surname: '源', surname_en: 'Kim', group: 'Red Velvet' }, // 源?덈┝
+  '?щ뵒': { surname: '??, surname_en: 'Son', group: 'Red Velvet' }, // ?먯듅??  '議곗씠': { surname: '諛?, surname_en: 'Park', group: 'Red Velvet' }, // 諛뺤닔??
+  // ================= SEVENTEEN =================
+  '?꾧껴': { surname: '??, surname_en: 'Lee', group: 'SEVENTEEN' }, // ?댁꽍誘?  '?붾끂': { surname: '??, surname_en: 'Lee', group: 'SEVENTEEN' }, // ?댁갔
+  '?붿뿉??: { surname: '??, surname_en: 'Seo', group: 'SEVENTEEN' }, // ?쒕챸??  '誘쇨퇋': { surname: '源', surname_en: 'Kim', group: 'SEVENTEEN' }, // 源誘쇨퇋
+  '踰꾨끉': { surname: '理?, surname_en: 'Choi', group: 'SEVENTEEN' }, // 理쒗븳??  '?밴?': { surname: '遺', surname_en: 'Boo', group: 'SEVENTEEN' }, // 遺?밴?
+  '?먯뒪荑깆뒪': { surname: '理?, surname_en: 'Choi', group: 'SEVENTEEN' }, // 理쒖듅泥?  '?곗?': { surname: '??, surname_en: 'Lee', group: 'SEVENTEEN' }, // ?댁???  '?먯슦': { surname: '??, surname_en: 'Jeon', group: 'SEVENTEEN' }, // ?꾩썝??  '?뺥븳': { surname: '??, surname_en: 'Yoon', group: 'SEVENTEEN' }, // ?ㅼ젙??  '議곗뒋??: { surname: '??, surname_en: 'Hong', group: 'SEVENTEEN' }, // ?띿???  '以': { surname: '臾?, surname_en: 'Moon', group: 'SEVENTEEN' }, // 臾몄???  '?몄떆': { surname: '沅?, surname_en: 'Kwon', group: 'SEVENTEEN' }, // 沅뚯닚??
+  // ================= SHINee =================
+  '誘쇳샇': { surname: '理?, surname_en: 'Choi', group: 'SHINee' }, // 理쒕???  '?⑥쑀': { surname: '??, surname_en: 'Lee', group: 'SHINee' }, // ?댁쭊湲?  '??: { surname: '源', surname_en: 'Kim', group: 'SHINee' }, // 源湲곕쾾
+  '?쒕?': { surname: '??, surname_en: 'Lee', group: 'SHINee' }, // ?댄깭誘?
+  // ================= STAYC =================
+  '?몄?': { surname: '??, surname_en: 'Yoon', group: 'STAYC' }, // ?ㅼ꽭?
+  '?섎?': { surname: '諛?, surname_en: 'Bae', group: 'STAYC' }, // 諛곗닔誘?  '?쒖?': { surname: '諛?, surname_en: 'Park', group: 'STAYC' }, // 諛뺤떆?
+  '?꾩씠??: { surname: '??, surname_en: 'Lee', group: 'STAYC' }, // ?댁콈??  '??: { surname: '??, surname_en: 'Shim', group: 'STAYC' }, // ?ъ옄??  '?ъ씠': { surname: '??, surname_en: 'Jang', group: 'STAYC' }, // ?μ삁?
+
+  // ================= Stray Kids =================
+  '由щ끂': { surname: '??, surname_en: 'Lee', group: 'Stray Kids' }, // ?대???  '諛⑹갔': { surname: '諛?, surname_en: 'Bang', group: 'Stray Kids' }, // 諛⑹갔
+  '?밸?': { surname: '源', surname_en: 'Kim', group: 'Stray Kids' }, // 源?밸?
+  '?꾩씠??: { surname: '??, surname_en: 'Yang', group: 'Stray Kids' }, // ?묒젙??  '李쎈퉰': { surname: '??, surname_en: 'Seo', group: 'Stray Kids' }, // ?쒖갹鍮?  '?꾨┃??: { surname: '??, surname_en: 'Lee', group: 'Stray Kids' }, // ?댁슜蹂?  '??: { surname: '??, surname_en: 'Han', group: 'Stray Kids' }, // ?쒖???  '?꾩쭊': { surname: '??, surname_en: 'Hwang', group: 'Stray Kids' }, // ?⑺쁽吏?
+  // ================= THE BOYZ =================
+  '?좎슦': { surname: '源', surname_en: 'Kim', group: 'THE BOYZ' }, // 源?좎슦
+  '??: { surname: '理?, surname_en: 'Choi', group: 'THE BOYZ' }, // 理쒖갔??  '?곸뿰': { surname: '??, surname_en: 'Lee', group: 'THE BOYZ' }, // ?댁긽??  '?먮┃': { surname: '??, surname_en: 'Son', group: 'THE BOYZ' }, // ?먯쁺??  '?곹썕': { surname: '源', surname_en: 'Kim', group: 'THE BOYZ' }, // 源?곹썕
+  '?쒖씠肄?: { surname: '諛?, surname_en: 'Bae', group: 'THE BOYZ' }, // 諛곗???  '二쇱뿰': { surname: '??, surname_en: 'Lee', group: 'THE BOYZ' }, // ?댁＜??  '二쇳븰??: { surname: '二?, surname_en: 'Joo', group: 'THE BOYZ' }, // 二쇳븰??  '耳鍮?: { surname: '臾?, surname_en: 'Moon', group: 'THE BOYZ' }, // 臾명삎??  '??: { surname: '吏', surname_en: 'Ji', group: 'THE BOYZ' }, // 吏李쎈?
+  '?꾩옱': { surname: '??, surname_en: 'Lee', group: 'THE BOYZ' }, // ?댁옱??
+  // ================= TREASURE =================
+  '?꾩쁺': { surname: '源', surname_en: 'Kim', group: 'TREASURE' }, // 源?꾩쁺
+  '諛뺤젙??: { surname: '諛?, surname_en: 'Park', group: 'TREASURE' }, // 諛뺤젙??  '?뚯젙??: { surname: '??, surname_en: '??, group: 'TREASURE' }, // ?뚯젙??  '?꾩궗??: { surname: '??, surname_en: 'Ha', group: 'TREASURE' }, // ?섎쭏???꾩궗??  '?붿떆': { surname: '移?, surname_en: '移?, group: 'TREASURE' }, // 移대꽕紐⑦넗 ?붿떆?몃━
+  '?ㅼ옱??: { surname: '??, surname_en: 'Yoon', group: 'TREASURE' }, // ?ㅼ옱??  '以洹?: { surname: '源', surname_en: 'Kim', group: 'TREASURE' }, // 源以洹?  '理쒗쁽??: { surname: '理?, surname_en: 'Choi', group: 'TREASURE' }, // 理쒗쁽??  '?섎（??: { surname: '?', surname_en: 'Watanabe', group: 'TREASURE' }, // ???섎쿋 ?섎（??
+  // ================= TWICE =================
+  '?섏뿰': { surname: '??, surname_en: 'Im', group: 'TWICE' }, // ?꾨굹??  '?ㅽ쁽': { surname: '源', surname_en: 'Kim', group: 'TWICE' }, // 源?ㅽ쁽
+  '紐⑤え': { surname: '??, surname_en: '??, group: 'TWICE' }, // ?덈씪??紐⑤え
+  '誘몃굹': { surname: '臾?, surname_en: '臾?, group: 'TWICE' }, // 臾섏씠 誘몃굹
+  '?щ굹': { surname: '誘?, surname_en: '誘?, group: 'TWICE' }, // 誘몃굹?좎옄???щ굹
+  '?뺤뿰': { surname: '??, surname_en: 'Yu', group: 'TWICE' }, // ?좎젙??  '吏??: { surname: '諛?, surname_en: 'Park', group: 'TWICE' }, // 諛뺤???  '易붿쐞': { surname: '?', surname_en: '?', group: 'TWICE' }, // ??곗캈??  '梨꾩쁺': { surname: '??, surname_en: 'Son', group: 'TWICE' }, // ?먯콈??
+  // ================= TWS =================
+  '?곸옱': { surname: '理?, surname_en: 'Choi', group: 'TWS' }, // 理쒖쁺??  '吏??: { surname: '??, surname_en: 'Han', group: 'TWS' }, // ?쒖???  '寃쎈?': { surname: '??, surname_en: 'Im', group: 'TWS' }, // ?꾧꼍誘?  '?꾪썕': { surname: '理?, surname_en: 'Choi', group: 'TWS' }, // 理쒕룄??  '?좎쑀': { surname: '??, surname_en: 'Shin', group: 'TWS' }, // ?좎젙??  '?쒖쭊': { surname: '??, surname_en: 'Han', group: 'TWS' }, // ?쒖쭊
+
+  // ================= TXT =================
+  '踰붽퇋': { surname: '理?, surname_en: 'Choi', group: 'TXT' }, // 理쒕쾾洹?  '?섎퉰': { surname: '理?, surname_en: 'Choi', group: 'TXT' }, // 理쒖닔鍮?  '?곗?': { surname: '理?, surname_en: 'Choi', group: 'TXT' }, // 理쒖뿰以
+  '?쒗쁽': { surname: '媛?, surname_en: 'Kang', group: 'TXT' }, // 媛뺥깭??  '?대떇移댁씠': { surname: '移?, surname_en: '移?, group: 'TXT' }, // 移댁씠 移대쭚 ?대떇
+
+  // ================= VIVIZ =================
+  '?좊퉬': { surname: '??, surname_en: 'Hwang', group: 'VIVIZ' }, // ?⑹?鍮?  '?꾩?': { surname: '源', surname_en: 'Kim', group: 'VIVIZ' }, // 源?덉썝
+  '???: { surname: '??, surname_en: 'Jung', group: 'VIVIZ' }, // ?뺤?鍮?
+  // ================= ZEROBASEONE =================
+  '源洹쒕퉰': { surname: '源', surname_en: 'Kim', group: 'ZEROBASEONE' }, // 源洹쒕퉰
+  '源吏??: { surname: '源', surname_en: 'Kim', group: 'ZEROBASEONE' }, // 源吏??  '源?쒕옒': { surname: '源', surname_en: 'Kim', group: 'ZEROBASEONE' }, // 源?쒕옒
+  '由ы궎': { surname: '??, surname_en: '??, group: 'ZEROBASEONE' }, // ?섏랬?덈（??  '諛뺢굔??: { surname: '諛?, surname_en: 'Park', group: 'ZEROBASEONE' }, // 諛뺢굔??  '?앸ℓ??: { surname: '??, surname_en: 'Seok', group: 'ZEROBASEONE' }, // ?앹슦??  '?깊븳鍮?: { surname: '??, surname_en: 'Sung', group: 'ZEROBASEONE' }, // ?깊븳鍮?  '?ν븯??: { surname: '??, surname_en: 'Jang', group: 'ZEROBASEONE' }, // ?ν븯??  '?쒖쑀吏?: { surname: '??, surname_en: 'Han', group: 'ZEROBASEONE' }, // ?쒖쑀吏?
+  // ================= aespa =================
+  '?앸떇': { surname: '??, surname_en: 'Ning', group: 'aespa' }, // ?앹씠以?  '?덊꽣': { surname: '源', surname_en: 'Kim', group: 'aespa' }, // 源誘쇱젙
+  '吏??: { surname: '??, surname_en: 'Woo', group: 'aespa' }, // ?곗튂?섍? ?먮━
+  '移대━??: { surname: '??, surname_en: 'Yu', group: 'aespa' }, // ?좎?誘?
+  // ================= 媛뺣떎?덉뿕 =================
+  '媛뺣떎?덉뿕': { surname: '媛?, surname_en: 'Kang', group: '媛뺣떎?덉뿕' }, // 媛뺣떎?덉뿕
+
+  // ================= 沅뚯?鍮?=================
+  '沅뚯?鍮?: { surname: '沅?, surname_en: 'Kwon', group: '沅뚯?鍮? }, // 沅뚯?鍮?
+  // ================= ?좊? =================
+  '?좊?': { surname: '??, surname_en: 'Lee', group: '?좊?' }, // ?댁꽑誘?
+  // ================= ?대Т吏?=================
+  '?대Т吏?: { surname: '??, surname_en: 'Lee', group: '?대Т吏? }, // ?대Т吏?
+  // ================= ?꾩쁺??=================
+  '?꾩쁺??: { surname: '??, surname_en: 'Im', group: '?꾩쁺?? }, // ?꾩쁺??
+  // ================= ?꾩냼誘?=================
+  '?꾩냼誘?: { surname: '??, surname_en: '??, group: '?꾩냼誘? }, // ?먮땳 ?뚮? ?ㅼ슦留?
+  // ================= 吏肄?=================
+  '吏肄?: { surname: '??, surname_en: 'Woo', group: '吏肄? }, // ?곗???
+  // ================= 泥?븯 =================
+  '泥?븯': { surname: '源', surname_en: 'Kim', group: '泥?븯' }, // 源李щ?
+
+  // ================= 理쒖삁??=================
+  '理쒖삁??: { surname: '理?, surname_en: 'Choi', group: '理쒖삁?? }, // 理쒖삁??
+// Total: 233 idols

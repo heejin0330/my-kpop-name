@@ -954,6 +954,32 @@ import * as htmlToImage from 'html-to-image';
                       <p className="text-gray-300 text-sm leading-relaxed font-light">{result.meaning}</p>
                     </div>
                   </div>
+                  
+                  {/* 글자별 의미 표시 */}
+                  {result.character_meanings && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="mt-4 pt-4 border-t border-white/10"
+                    >
+                      <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider mb-2">Character Meanings</p>
+                      <div className="space-y-2">
+                        <div className="flex items-start gap-2">
+                          <span className="text-pink-300 font-semibold text-sm">{result.character_meanings.month.character}</span>
+                          <span className="text-gray-400 text-xs">({result.character_meanings.month.romanized})</span>
+                          <span className="text-gray-300 text-xs ml-auto">:</span>
+                          <span className="text-gray-300 text-xs flex-1">{result.character_meanings.month.meaning}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <span className="text-purple-300 font-semibold text-sm">{result.character_meanings.day.character}</span>
+                          <span className="text-gray-400 text-xs">({result.character_meanings.day.romanized})</span>
+                          <span className="text-gray-300 text-xs ml-auto">:</span>
+                          <span className="text-gray-300 text-xs flex-1">{result.character_meanings.day.meaning}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
                 
                 {/* 공유 버튼 영역 */}
