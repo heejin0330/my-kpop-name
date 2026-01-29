@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy } from 'lucide-react';
+import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy, Sparkles, PenTool } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as htmlToImage from 'html-to-image';
 
-export default function Home() {
+       export default function Home() {
   const [inputs, setInputs] = useState({ userName: '', userBirthday: '', userGender: 'Female', idolName: '', language: 'en' });
   const [birthday, setBirthday] = useState({ year: '', month: '', day: '' });
   const [loading, setLoading] = useState(false);
@@ -16,6 +16,9 @@ export default function Home() {
   const [searching, setSearching] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+         const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0); // 0: 성 추출중, 1: 이름 짓는중, 2: 궁합보는중
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
   
   // 생일 입력 자동 이동을 위한 refs
   const monthRef = useRef<HTMLInputElement>(null);
@@ -145,6 +148,9 @@ export default function Home() {
       // 하단 안내
       footerPrivacy: "This service does not store any personal information entered.",
       footerDesc: "This service uses AI to create Korean names with the same surname as your ultimate bias.",
+             footerMore: "More details",
+             footerModalTitle: "Privacy & Cookies",
+             footerModalBody: "DATA COLLECTION & STORAGE:\n• This service does NOT permanently store any personal information you enter (name, birthday, gender, idol preference).\n• All inputs are processed in real-time via Google Gemini AI API to generate your K-POP name and are immediately discarded after generation.\n• No user data is saved to our servers or databases.\n\nTHIRD-PARTY SERVICES:\n• Google Analytics: Used to collect anonymized usage statistics (page views, device type, approximate region). Uses cookies for this purpose.\n• Google Gemini AI: Processes your inputs to generate Korean names. Data is sent to Google's servers but not stored by us.\n• iTunes Search API: Used to search for K-POP idols and music previews. Your search queries may be processed by Apple's servers.\n• Ko-fi: If you choose to support via the Ko-fi button, you will be redirected to Ko-fi's website. Ko-fi's privacy policy applies to any transactions.\n\nCOOKIES:\n• We use cookies only for analytics purposes (Google Analytics).\n• These cookies collect anonymized data and do not personally identify you.\n• You can disable cookies in your browser settings, though this may affect some functionality.\n\nYOUR RIGHTS:\n• You can use this service without providing any personal information (birthday is optional).\n• All data processing happens in real-time and is not retained.\n• If you have concerns, please contact us or avoid using the service.",
       // 공유
       shareTitle: "Share Result",
       shareDownload: "Save Image",
@@ -158,7 +164,11 @@ export default function Home() {
       // 성씨
       sameSurname: "Same Family Name",
       // Ko-fi
-      kofiText: "Enjoyed? Support the developer! ☕"
+      kofiText: "Enjoyed? Support the developer! ☕",
+      // 로딩 단계
+      loadingStep1: "Extracting your bias's surname...",
+      loadingStep2: "Creating Korean name...",
+      loadingStep3: "Calculating compatibility..."
     },
     ko: { 
       title: "나의 케이팝 이름", 
@@ -178,6 +188,9 @@ export default function Home() {
       resMeaning: "이름의 뜻",
       footerPrivacy: "본 서비스는 입력된 개인 정보를 저장하지 않습니다.",
       footerDesc: "본 서비스는 AI를 활용하여 최애의 성과 같은 성으로 한국 이름을 지어주는 서비스입니다.",
+             footerMore: "자세히 보기",
+             footerModalTitle: "개인정보 및 쿠키 안내",
+             footerModalBody: "데이터 수집 및 저장:\n• 본 서비스는 사용자가 입력한 이름, 생년월일, 성별, 최애 정보 등 개인 정보를 서버에 영구 저장하지 않습니다.\n• 모든 입력 정보는 Google Gemini AI API를 통해 실시간으로 처리되어 K-POP 이름을 생성하며, 생성 후 즉시 폐기됩니다.\n• 사용자 데이터는 서버나 데이터베이스에 저장되지 않습니다.\n\n외부 서비스 사용:\n• Google Analytics: 익명화된 이용 통계(페이지 조회수, 기기 유형, 대략적 지역) 수집을 위해 사용됩니다. 쿠키를 사용합니다.\n• Google Gemini AI: 입력 정보를 처리하여 한국 이름을 생성합니다. 데이터는 Google 서버로 전송되지만, 저희가 저장하지는 않습니다.\n• iTunes Search API: K-POP 아이돌 및 음악 미리듣기 검색에 사용됩니다. 검색어는 Apple 서버에서 처리될 수 있습니다.\n• Ko-fi: Ko-fi 버튼을 통해 후원하시는 경우, Ko-fi 웹사이트로 이동합니다. 거래 관련 사항은 Ko-fi의 개인정보 처리방침이 적용됩니다.\n\n쿠키:\n• 분석 목적(Google Analytics)으로만 쿠키를 사용합니다.\n• 이러한 쿠키는 익명화된 데이터를 수집하며, 개인을 식별하지 않습니다.\n• 브라우저 설정에서 쿠키를 비활성화할 수 있으나, 일부 기능에 영향을 줄 수 있습니다.\n\n사용자 권리:\n• 개인 정보 없이도 서비스를 이용할 수 있습니다(생년월일은 선택 사항).\n• 모든 데이터 처리는 실시간으로 이루어지며 보관되지 않습니다.\n• 문의사항이 있으시면 연락 주시거나 서비스 이용을 중단하실 수 있습니다.",
       shareTitle: "결과 공유하기",
       shareDownload: "이미지 저장",
       shareCopy: "복사",
@@ -187,7 +200,11 @@ export default function Home() {
       searchNoResults: "검색 결과가 없습니다",
       searchSelect: "선택",
       sameSurname: "같은 성씨",
-      kofiText: "재밌으셨나요? 개발자에게 커피 한잔! ☕"
+      kofiText: "재밌으셨나요? 개발자에게 커피 한잔! ☕",
+      // 로딩 단계
+      loadingStep1: "최애의 성 추출중...",
+      loadingStep2: "한국이름 짓는중...",
+      loadingStep3: "궁합보는중..."
     },
     jp: {
       title: "私のK-POP名",
@@ -207,6 +224,9 @@ export default function Home() {
       resMeaning: "名前の意味",
       footerPrivacy: "本サービスは入力された個人情報を保存しません。",
       footerDesc: "本サービスはAIを活用して、推しと同じ苗字の韓国名を作成するサービスです。",
+             footerMore: "詳細を見る",
+             footerModalTitle: "プライバシーとクッキーについて",
+             footerModalBody: "データの収集と保存:\n• 本サービスは、入力された名前、誕生日、性別、推しの情報などの個人情報をサーバーに永続的に保存しません。\n• すべての入力情報は、Google Gemini AI APIを通じてリアルタイムで処理され、K-POP名を生成した後、即座に破棄されます。\n• ユーザーデータはサーバーやデータベースに保存されません。\n\n外部サービスの利用:\n• Google Analytics: 匿名化された利用統計（ページビュー、デバイスタイプ、おおよその地域）を収集するために使用されます。この目的でクッキーを使用します。\n• Google Gemini AI: 入力情報を処理して韓国名を生成します。データはGoogleのサーバーに送信されますが、当社が保存することはありません。\n• iTunes Search API: K-POPアイドルや音楽プレビューの検索に使用されます。検索クエリはAppleのサーバーで処理される場合があります。\n• Ko-fi: Ko-fiボタンを通じてサポートする場合、Ko-fiのウェブサイトにリダイレクトされます。取引に関する事項はKo-fiのプライバシーポリシーが適用されます。\n\nクッキー:\n• 分析目的（Google Analytics）でのみクッキーを使用します。\n• これらのクッキーは匿名化されたデータを収集し、個人を特定しません。\n• ブラウザ設定でクッキーを無効にすることができますが、一部の機能に影響を与える可能性があります。\n\nユーザーの権利:\n• 個人情報を提供せずにサービスを利用できます（誕生日は任意）。\n• すべてのデータ処理はリアルタイムで行われ、保持されません。\n• ご不明な点がございましたら、お問い合わせいただくか、サービスの利用を中止してください。",
       shareTitle: "結果をシェア",
       shareDownload: "画像保存",
       shareCopy: "コピー",
@@ -216,7 +236,11 @@ export default function Home() {
       searchNoResults: "結果が見つかりません",
       searchSelect: "選択",
       sameSurname: "同じ姓",
-      kofiText: "楽しんでいただけましたか？開発者にコーヒーを一杯！ ☕"
+      kofiText: "楽しんでいただけましたか？開発者にコーヒーを一杯！ ☕",
+      // 로딩 단계
+      loadingStep1: "推しの姓を抽出中...",
+      loadingStep2: "韓国名を作成中...",
+      loadingStep3: "相性を計算中..."
     },
     th: {
       title: "ชื่อ K-POP ของฉัน",
@@ -236,6 +260,9 @@ export default function Home() {
       resMeaning: "ความหมายของชื่อ",
       footerPrivacy: "บริการนี้ไม่เก็บข้อมูลส่วนบุคคลที่ป้อน",
       footerDesc: "บริการนี้ใช้ AI เพื่อสร้างชื่อเกาหลีที่มีนามสกุลเดียวกับเมนของคุณ",
+             footerMore: "ดูรายละเอียด",
+             footerModalTitle: "ข้อมูลส่วนบุคคลและคุกกี้",
+             footerModalBody: "การเก็บรวบรวมและจัดเก็บข้อมูล:\n• บริการนี้จะไม่เก็บข้อมูลส่วนบุคคลที่คุณป้อน (ชื่อ วันเกิด เพศ ความชอบในไอดอล) ไว้บนเซิร์ฟเวอร์อย่างถาวร\n• ข้อมูลที่ป้อนทั้งหมดจะถูกประมวลผลแบบเรียลไทม์ผ่าน Google Gemini AI API เพื่อสร้างชื่อ K-POP และจะถูกทิ้งทันทีหลังจากการสร้าง\n• ไม่มีการบันทึกข้อมูลผู้ใช้ไว้บนเซิร์ฟเวอร์หรือฐานข้อมูลของเรา\n\nบริการของบุคคลที่สาม:\n• Google Analytics: ใช้เพื่อรวบรวมสถิติการใช้งานแบบไม่ระบุตัวตน (จำนวนการดูหน้า ประเภทอุปกรณ์ ภูมิภาคโดยประมาณ) ใช้คุกกี้เพื่อจุดประสงค์นี้\n• Google Gemini AI: ประมวลผลข้อมูลที่คุณป้อนเพื่อสร้างชื่อเกาหลี ข้อมูลจะถูกส่งไปยังเซิร์ฟเวอร์ของ Google แต่เราไม่ได้เก็บไว้\n• iTunes Search API: ใช้เพื่อค้นหาไอดอล K-POP และตัวอย่างเพลง คำค้นหาของคุณอาจถูกประมวลผลโดยเซิร์ฟเวอร์ของ Apple\n• Ko-fi: หากคุณเลือกสนับสนุนผ่านปุ่ม Ko-fi คุณจะถูกเปลี่ยนเส้นทางไปยังเว็บไซต์ Ko-fi นโยบายความเป็นส่วนตัวของ Ko-fi จะใช้กับธุรกรรมใดๆ\n\nคุกกี้:\n• เราใช้คุกกี้เพื่อการวิเคราะห์เท่านั้น (Google Analytics)\n• คุกกี้เหล่านี้รวบรวมข้อมูลแบบไม่ระบุตัวตนและไม่ระบุตัวตนของคุณ\n• คุณสามารถปิดการใช้งานคุกกี้ในการตั้งค่าเบราว์เซอร์ของคุณได้ แม้ว่านี่อาจส่งผลกระทบต่อฟังก์ชันการทำงานบางอย่าง\n\nสิทธิ์ของคุณ:\n• คุณสามารถใช้บริการนี้ได้โดยไม่ต้องให้ข้อมูลส่วนบุคคล (วันเกิดเป็นทางเลือก)\n• การประมวลผลข้อมูลทั้งหมดเกิดขึ้นแบบเรียลไทม์และไม่ถูกเก็บไว้\n• หากคุณมีข้อกังวล โปรดติดต่อเราหรือหลีกเลี่ยงการใช้บริการ",
       shareTitle: "แชร์ผลลัพธ์",
       shareDownload: "บันทึกรูป",
       shareCopy: "คัดลอก",
@@ -245,7 +272,11 @@ export default function Home() {
       searchNoResults: "ไม่พบผลลัพธ์",
       searchSelect: "เลือก",
       sameSurname: "นามสกุลเดียวกัน",
-      kofiText: "สนุกไหม? รองรับนักพัฒนา! ☕"
+      kofiText: "สนุกไหม? รองรับนักพัฒนา! ☕",
+      // 로딩 단계
+      loadingStep1: "กำลังดึงนามสกุลของเมน...",
+      loadingStep2: "กำลังสร้างชื่อเกาหลี...",
+      loadingStep3: "กำลังคำนวณความเข้ากัน..."
     },
     es: {
       title: "Mi Nombre K-POP",
@@ -265,6 +296,9 @@ export default function Home() {
       resMeaning: "Significado del nombre",
       footerPrivacy: "Este servicio no almacena ninguna información personal ingresada.",
       footerDesc: "Este servicio utiliza IA para crear nombres coreanos con el mismo apellido que tu Bias.",
+             footerMore: "Ver más detalles",
+             footerModalTitle: "Privacidad y cookies",
+             footerModalBody: "RECOPILACIÓN Y ALMACENAMIENTO DE DATOS:\n• Este servicio NO almacena de forma permanente ninguna información personal que ingreses (nombre, fecha de nacimiento, género, preferencia de ídolo).\n• Todas las entradas se procesan en tiempo real a través de la API de Google Gemini AI para generar tu nombre K-POP y se descartan inmediatamente después de la generación.\n• No se guardan datos de usuario en nuestros servidores o bases de datos.\n\nSERVICIOS DE TERCEROS:\n• Google Analytics: Se utiliza para recopilar estadísticas de uso anonimizadas (vistas de página, tipo de dispositivo, región aproximada). Utiliza cookies para este propósito.\n• Google Gemini AI: Procesa tus entradas para generar nombres coreanos. Los datos se envían a los servidores de Google pero no los almacenamos.\n• API de búsqueda de iTunes: Se utiliza para buscar ídolos K-POP y vistas previas de música. Tus consultas de búsqueda pueden ser procesadas por los servidores de Apple.\n• Ko-fi: Si eliges apoyar a través del botón Ko-fi, serás redirigido al sitio web de Ko-fi. La política de privacidad de Ko-fi se aplica a cualquier transacción.\n\nCOOKIES:\n• Solo utilizamos cookies con fines analíticos (Google Analytics).\n• Estas cookies recopilan datos anonimizados y no te identifican personalmente.\n• Puedes desactivar las cookies en la configuración de tu navegador, aunque esto puede afectar algunas funcionalidades.\n\nTUS DERECHOS:\n• Puedes usar este servicio sin proporcionar información personal (la fecha de nacimiento es opcional).\n• Todo el procesamiento de datos ocurre en tiempo real y no se retiene.\n• Si tienes inquietudes, contáctanos o evita usar el servicio.",
       shareTitle: "Compartir resultado",
       shareDownload: "Guardar imagen",
       shareCopy: "Copiar",
@@ -274,7 +308,11 @@ export default function Home() {
       searchNoResults: "No se encontraron resultados",
       searchSelect: "Seleccionar",
       sameSurname: "Mismo apellido",
-      kofiText: "¿Te gustó? ¡Apoya al desarrollador! ☕"
+      kofiText: "¿Te gustó? ¡Apoya al desarrollador! ☕",
+      // 로딩 단계
+      loadingStep1: "Extrayendo el apellido de tu Bias...",
+      loadingStep2: "Creando nombre coreano...",
+      loadingStep3: "Calculando compatibilidad..."
     },
     ar: {
       title: "اسم الكيبوب الخاص بي",
@@ -294,6 +332,9 @@ export default function Home() {
       resMeaning: "معنى الاسم",
       footerPrivacy: "هذه الخدمة لا تخزن أي معلومات شخصية تم إدخالها.",
       footerDesc: "تستخدم هذه الخدمة الذكاء الاصطناعي لإنشاء أسماء كورية بنفس لقب البايس الخاص بك.",
+             footerMore: "مزيد من التفاصيل",
+             footerModalTitle: "الخصوصية وملفات تعريف الارتباط",
+             footerModalBody: "جمع البيانات والتخزين:\n• لا تقوم هذه الخدمة بتخزين أي معلومات شخصية تدخلها (الاسم، تاريخ الميلاد، الجنس، تفضيل الأيدول) بشكل دائم.\n• تتم معالجة جميع المدخلات في الوقت الفعلي عبر واجهة برمجة تطبيقات Google Gemini AI لإنشاء اسم K-POP الخاص بك ويتم التخلص منها فورًا بعد الإنشاء.\n• لا يتم حفظ بيانات المستخدم على خوادمنا أو قواعد البيانات.\n\nخدمات الطرف الثالث:\n• Google Analytics: يُستخدم لجمع إحصائيات الاستخدام المجهولة (مشاهدات الصفحة، نوع الجهاز، المنطقة التقريبية). يستخدم ملفات تعريف الارتباط لهذا الغرض.\n• Google Gemini AI: يعالج مدخلاتك لإنشاء أسماء كورية. يتم إرسال البيانات إلى خوادم Google لكننا لا نخزنها.\n• واجهة برمجة تطبيقات بحث iTunes: تُستخدم للبحث عن أيدولات K-POP ومعاينات الموسيقى. قد تتم معالجة استعلامات البحث الخاصة بك بواسطة خوادم Apple.\n• Ko-fi: إذا اخترت الدعم عبر زر Ko-fi، سيتم إعادة توجيهك إلى موقع Ko-fi. تنطبق سياسة خصوصية Ko-fi على أي معاملات.\n\nملفات تعريف الارتباط:\n• نستخدم ملفات تعريف الارتباط فقط لأغراض التحليل (Google Analytics).\n• تجمع ملفات تعريف الارتباط هذه بيانات مجهولة ولا تحدد هويتك شخصيًا.\n• يمكنك تعطيل ملفات تعريف الارتباط في إعدادات المتصفح الخاص بك، على الرغم من أن هذا قد يؤثر على بعض الوظائف.\n\nحقوقك:\n• يمكنك استخدام هذه الخدمة دون تقديم أي معلومات شخصية (تاريخ الميلاد اختياري).\n• تحدث جميع معالجة البيانات في الوقت الفعلي ولا يتم الاحتفاظ بها.\n• إذا كانت لديك مخاوف، يرجى الاتصال بنا أو تجنب استخدام الخدمة.",
       shareTitle: "مشاركة النتيجة",
       shareDownload: "حفظ الصورة",
       shareCopy: "نسخ",
@@ -303,7 +344,11 @@ export default function Home() {
       searchNoResults: "لم يتم العثور على نتائج",
       searchSelect: "اختر",
       sameSurname: "نفس اللقب",
-      kofiText: "استمتعت؟ ادعم المطور! ☕"
+      kofiText: "استمتعت؟ ادعم المطور! ☕",
+      // 로딩 단계
+      loadingStep1: "جارٍ استخراج لقب البايس...",
+      loadingStep2: "جارٍ إنشاء الاسم الكوري...",
+      loadingStep3: "جارٍ حساب التوافق..."
     }
   };
   
@@ -406,12 +451,57 @@ export default function Home() {
     if (!inputs.userName || !inputs.idolName) return alert("Please fill in all fields!");
     setLoading(true);
     setResult(null);
+    setShowLoadingModal(true);
+    setLoadingStep(0);
+    
+    // idolData가 없으면 아이돌 검색 시도 (previewUrl을 얻기 위해)
+    let currentPreviewUrl = idolData.previewUrl;
+    let currentIdolData = { ...idolData };
+    
+    if (!currentPreviewUrl && inputs.idolName) {
+      console.log('🔍 No previewUrl found, attempting to search for idol:', inputs.idolName);
+      try {
+        const term = `${inputs.idolName} kpop`;
+        const res = await fetch(
+          `https://itunes.apple.com/search?term=${encodeURIComponent(
+            term
+          )}&entity=song&media=music&country=KR&limit=5`
+        );
+        const searchData = await res.json();
+        
+        if (searchData.resultCount > 0) {
+          // 첫 번째 결과 사용
+          const firstSong = searchData.results.find((song: any) => song.previewUrl) || searchData.results[0];
+          if (firstSong && firstSong.previewUrl) {
+            currentIdolData = {
+              image: firstSong.artworkUrl100?.replace('100x100', '600x600') || '',
+              track: `${firstSong.trackName} - ${firstSong.artistName}`,
+              previewUrl: firstSong.previewUrl
+            };
+            currentPreviewUrl = firstSong.previewUrl;
+            setIdolData(currentIdolData);
+            console.log('✅ Found previewUrl for idol:', firstSong.previewUrl);
+          }
+        }
+      } catch (searchError) {
+        console.warn('⚠️ Failed to search for idol music:', searchError);
+      }
+    }
     
     // 바로 직전에 나온 한국 이름을 함께 보내서, 같은 이름이 연속으로 나오지 않도록 힌트 제공
     const payload = {
       ...inputs,
       lastKoreanName: result?.korean_name || '',
     };
+
+    // 단계별 시뮬레이션
+    const stepTimer1 = setTimeout(() => {
+      setLoadingStep(1);
+    }, 1000);
+    
+    const stepTimer2 = setTimeout(() => {
+      setLoadingStep(2);
+    }, 2500);
 
     try {
       const res = await fetch('/api/generate', {
@@ -420,31 +510,82 @@ export default function Home() {
       });
       const data = await res.json();
       
-      if (data.error) { alert("Error: " + data.error); return; }
+      // 타이머 정리
+      clearTimeout(stepTimer1);
+      clearTimeout(stepTimer2);
+      
+      if (data.error) { 
+        setShowLoadingModal(false);
+        alert("Error: " + data.error); 
+        return; 
+      }
+      
+      // 마지막 단계로 설정 후 잠시 대기
+      setLoadingStep(2);
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       setResult(data);
+      setShowLoadingModal(false);
       
       // 음악 자동 재생 (사용자 상호작용 후이므로 가능)
-      if (idolData.previewUrl && audioRef.current) {
+      // currentPreviewUrl 또는 업데이트된 idolData 사용
+      const previewUrlToUse = currentPreviewUrl || idolData.previewUrl;
+      
+      console.log('🎵 Music playback check:', {
+        hasPreviewUrl: !!previewUrlToUse,
+        previewUrl: previewUrlToUse,
+        hasAudioRef: !!audioRef.current,
+        currentIdolData: currentIdolData,
+        idolData: idolData
+      });
+      
+      if (previewUrlToUse && audioRef.current) {
         const audio = audioRef.current;
-        audio.pause(); // 기존 재생 먼저 중지
-        audio.currentTime = 0;
-        audio.src = idolData.previewUrl;
-        audio.volume = 0.3;
-        
-        // play() Promise 안전 처리
-        const playPromise = audio.play();
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => setIsPlaying(true))
-            .catch((err) => {
-              console.log('Audio autoplay blocked:', err.message);
-              setIsPlaying(false);
-            });
+        try {
+          audio.pause(); // 기존 재생 먼저 중지
+          audio.currentTime = 0;
+          audio.src = previewUrlToUse;
+          audio.volume = 0.3;
+          
+          console.log('🎵 Attempting to play music:', previewUrlToUse);
+          
+          // play() Promise 안전 처리
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log('✅ Music playback started successfully');
+                setIsPlaying(true);
+              })
+              .catch((err) => {
+                console.error('❌ Audio autoplay blocked or failed:', err.message, err);
+                setIsPlaying(false);
+              });
+          } else {
+            console.warn('⚠️ play() returned undefined');
+            setIsPlaying(false);
+          }
+        } catch (error: any) {
+          console.error('❌ Error setting up audio:', error.message, error);
+          setIsPlaying(false);
         }
+      } else {
+        console.warn('⚠️ Cannot play music:', {
+          reason: !previewUrlToUse ? 'No previewUrl' : 'No audioRef',
+          previewUrl: previewUrlToUse,
+          audioRef: !!audioRef.current
+        });
       }
-    } catch (e) { alert("Something went wrong. Please try again!"); } 
-    finally { setLoading(false); }
+    } catch (e) { 
+      clearTimeout(stepTimer1);
+      clearTimeout(stepTimer2);
+      setShowLoadingModal(false);
+      alert("Something went wrong. Please try again!"); 
+    } 
+    finally { 
+      setLoading(false);
+      setLoadingStep(0);
+    }
   };
 
   // 🔊 한국어 이름 발음 듣기 (TTS) - 한 글자씩 천천히 (버벅거림 없이)
@@ -876,9 +1017,181 @@ export default function Home() {
           <p className="text-[11px] text-gray-600 leading-relaxed">
             ✨ {txt.footerDesc}
           </p>
+                 <button
+                   type="button"
+                   onClick={() => setShowPrivacyModal(true)}
+                   className="mt-1 text-[11px] text-pink-400 hover:text-pink-300 underline underline-offset-4"
+                 >
+                   {txt.footerMore}
+                 </button>
         </footer>
       </div>
       <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
+
+             {/* 개인정보/쿠키 안내 모달 */}
+             <AnimatePresence>
+               {showPrivacyModal && (
+                 <motion.div
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   onClick={() => setShowPrivacyModal(false)}
+                   className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-8"
+                 >
+                   <motion.div
+                     initial={{ scale: 0.9, y: 10 }}
+                     animate={{ scale: 1, y: 0 }}
+                     exit={{ scale: 0.9, y: 10 }}
+                     onClick={(e) => e.stopPropagation()}
+                     className={`w-full max-w-lg max-h-[80vh] bg-[#0a0a0a] border border-white/20 rounded-2xl shadow-2xl flex flex-col ${isRTL ? 'text-right' : 'text-left'}`}
+                   >
+                     {/* 모달 헤더 */}
+                     <div className="flex items-center justify-between p-6 border-b border-white/10">
+                       <h2 className="text-base font-bold text-white">
+                         {txt.footerModalTitle}
+                       </h2>
+                       <button
+                         type="button"
+                         onClick={() => setShowPrivacyModal(false)}
+                         className="text-gray-400 hover:text-white text-lg font-semibold transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
+                         aria-label="Close"
+                       >
+                         ✕
+                       </button>
+                     </div>
+                     
+                     {/* 모달 본문 (스크롤 가능) */}
+                     <div className="flex-1 overflow-y-auto p-6">
+                       <p className="text-[12px] leading-relaxed text-gray-300 whitespace-pre-line">
+                         {txt.footerModalBody}
+                       </p>
+                     </div>
+                     
+                     {/* 모달 푸터 */}
+                     <div className="p-6 border-t border-white/10">
+                       <button
+                         type="button"
+                         onClick={() => setShowPrivacyModal(false)}
+                         className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold py-2.5 rounded-xl hover:from-pink-500 hover:to-purple-500 transition-all"
+                       >
+                         {inputs.language === 'ko' ? '확인' : inputs.language === 'jp' ? '了解' : inputs.language === 'th' ? 'เข้าใจ' : inputs.language === 'es' ? 'Entendido' : inputs.language === 'ar' ? 'فهمت' : 'Got it'}
+                       </button>
+                     </div>
+                   </motion.div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
+
+      {/* 로딩 모달 */}
+      <AnimatePresence>
+        {showLoadingModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 10 }}
+              className={`w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 border border-pink-500/30 rounded-2xl p-8 shadow-2xl ${isRTL ? 'text-right' : 'text-left'}`}
+            >
+              <div className="text-center space-y-6">
+                {/* 단계별 아이콘 및 메시지 */}
+                <div className="space-y-4">
+                  {/* 단계 1: 성 추출중 */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ 
+                      opacity: loadingStep === 0 ? 1 : loadingStep > 0 ? 0.3 : 0,
+                      y: loadingStep === 0 ? 0 : 10,
+                      scale: loadingStep === 0 ? 1 : 0.9
+                    }}
+                    className="flex items-center justify-center gap-3"
+                  >
+                    <div className={`p-3 rounded-full ${loadingStep === 0 ? 'bg-pink-500/20 border-2 border-pink-500' : 'bg-gray-700/50 border-2 border-gray-600'}`}>
+                      <Search className={`w-6 h-6 ${loadingStep === 0 ? 'text-pink-400' : 'text-gray-500'}`} />
+                    </div>
+                    <span className={`text-lg font-semibold ${loadingStep === 0 ? 'text-pink-300' : 'text-gray-500'}`}>
+                      {txt.loadingStep1}
+                    </span>
+                    {loadingStep === 0 && (
+                      <Loader2 className="w-5 h-5 text-pink-400 animate-spin" />
+                    )}
+                  </motion.div>
+
+                  {/* 단계 2: 이름 짓는중 */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ 
+                      opacity: loadingStep === 1 ? 1 : loadingStep > 1 ? 0.3 : 0,
+                      y: loadingStep === 1 ? 0 : 10,
+                      scale: loadingStep === 1 ? 1 : 0.9
+                    }}
+                    className="flex items-center justify-center gap-3"
+                  >
+                    <div className={`p-3 rounded-full ${loadingStep === 1 ? 'bg-purple-500/20 border-2 border-purple-500' : 'bg-gray-700/50 border-2 border-gray-600'}`}>
+                      <PenTool className={`w-6 h-6 ${loadingStep === 1 ? 'text-purple-400' : 'text-gray-500'}`} />
+                    </div>
+                    <span className={`text-lg font-semibold ${loadingStep === 1 ? 'text-purple-300' : 'text-gray-500'}`}>
+                      {txt.loadingStep2}
+                    </span>
+                    {loadingStep === 1 && (
+                      <Loader2 className="w-5 h-5 text-purple-400 animate-spin" />
+                    )}
+                  </motion.div>
+
+                  {/* 단계 3: 궁합보는중 */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ 
+                      opacity: loadingStep === 2 ? 1 : 0,
+                      y: loadingStep === 2 ? 0 : 10,
+                      scale: loadingStep === 2 ? 1 : 0.9
+                    }}
+                    className="flex items-center justify-center gap-3"
+                  >
+                    <div className={`p-3 rounded-full ${loadingStep === 2 ? 'bg-red-500/20 border-2 border-red-500' : 'bg-gray-700/50 border-2 border-gray-600'}`}>
+                      <Heart className={`w-6 h-6 ${loadingStep === 2 ? 'text-red-400 fill-red-400' : 'text-gray-500'}`} />
+                    </div>
+                    <span className={`text-lg font-semibold ${loadingStep === 2 ? 'text-red-300' : 'text-gray-500'}`}>
+                      {txt.loadingStep3}
+                    </span>
+                    {loadingStep === 2 && (
+                      <Loader2 className="w-5 h-5 text-red-400 animate-spin" />
+                    )}
+                  </motion.div>
+                </div>
+
+                {/* 진행 바 */}
+                <div className="w-full bg-gray-700/50 rounded-full h-2 overflow-hidden">
+                  <motion.div
+                    initial={{ width: '0%' }}
+                    animate={{ 
+                      width: loadingStep === 0 ? '33%' : loadingStep === 1 ? '66%' : '100%'
+                    }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                    className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-red-500 rounded-full"
+                  />
+                </div>
+
+                {/* 스파클 효과 */}
+                {loadingStep === 2 && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="flex justify-center"
+                  >
+                    <Sparkles className="w-8 h-8 text-yellow-400 animate-pulse" />
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
