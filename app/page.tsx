@@ -156,7 +156,9 @@ export default function Home() {
       searchNoResults: "No results found",
       searchSelect: "Select",
       // 성씨
-      sameSurname: "Same Family Name"
+      sameSurname: "Same Family Name",
+      // Ko-fi
+      kofiText: "Enjoyed? Support the developer! ☕"
     },
     ko: { 
       title: "나의 케이팝 이름", 
@@ -184,7 +186,8 @@ export default function Home() {
       searchResults: "검색 결과",
       searchNoResults: "검색 결과가 없습니다",
       searchSelect: "선택",
-      sameSurname: "같은 성씨"
+      sameSurname: "같은 성씨",
+      kofiText: "재밌으셨나요? 개발자에게 커피 한잔! ☕"
     },
     jp: {
       title: "私のK-POP名",
@@ -212,7 +215,8 @@ export default function Home() {
       searchResults: "検索結果",
       searchNoResults: "結果が見つかりません",
       searchSelect: "選択",
-      sameSurname: "同じ姓"
+      sameSurname: "同じ姓",
+      kofiText: "楽しんでいただけましたか？開発者にコーヒーを一杯！ ☕"
     },
     th: {
       title: "ชื่อ K-POP ของฉัน",
@@ -240,7 +244,8 @@ export default function Home() {
       searchResults: "ผลการค้นหา",
       searchNoResults: "ไม่พบผลลัพธ์",
       searchSelect: "เลือก",
-      sameSurname: "นามสกุลเดียวกัน"
+      sameSurname: "นามสกุลเดียวกัน",
+      kofiText: "สนุกไหม? รองรับนักพัฒนา! ☕"
     },
     es: {
       title: "Mi Nombre K-POP",
@@ -268,7 +273,8 @@ export default function Home() {
       searchResults: "Resultados de búsqueda",
       searchNoResults: "No se encontraron resultados",
       searchSelect: "Seleccionar",
-      sameSurname: "Mismo apellido"
+      sameSurname: "Mismo apellido",
+      kofiText: "¿Te gustó? ¡Apoya al desarrollador! ☕"
     },
     ar: {
       title: "اسم الكيبوب الخاص بي",
@@ -296,7 +302,8 @@ export default function Home() {
       searchResults: "نتائج البحث",
       searchNoResults: "لم يتم العثور على نتائج",
       searchSelect: "اختر",
-      sameSurname: "نفس اللقب"
+      sameSurname: "نفس اللقب",
+      kofiText: "استمتعت؟ ادعم المطور! ☕"
     }
   };
   
@@ -836,6 +843,25 @@ export default function Home() {
                   >
                     <Copy className="w-4 h-4" />
                   </button>
+                </motion.div>
+                
+                {/* Ko-fi 후원 버튼 */}
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="mt-6 text-center"
+                >
+                  <p className="text-sm text-gray-400 mb-3">{txt.kofiText}</p>
+                  <a
+                    href="https://ko-fi.com/YOUR_USERNAME"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#29ABE0] hover:bg-[#2389C4] text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-[#29ABE0]/30"
+                  >
+                    <span>☕</span>
+                    <span>Buy me a coffee</span>
+                  </a>
                 </motion.div>
               </motion.div>
             )}
