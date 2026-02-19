@@ -5,6 +5,40 @@ import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share
 import { motion, AnimatePresence } from 'framer-motion';
 import * as htmlToImage from 'html-to-image';
 
+// '○○의 해' 한글 → 설정 언어 번역 (결과 문장 이중 표시용)
+const YEAR_COLORS: Record<string, Record<string, string>> = {
+  ko: { '푸른': '푸른', '붉은': '붉은', '노란': '노란', '흰': '흰', '검은': '검은' },
+  en: { '푸른': 'Blue', '붉은': 'Red', '노란': 'Yellow', '흰': 'White', '검은': 'Black' },
+  jp: { '푸른': '青', '붉은': '赤', '노란': '黄', '흰': '白', '검은': '黒' },
+  th: { '푸른': 'น้ำเงิน', '붉은': 'แดง', '노란': 'เหลือง', '흰': 'ขาว', '검은': 'ดำ' },
+  es: { '푸른': 'Azul', '붉은': 'Rojo', '노란': 'Amarillo', '흰': 'Blanco', '검은': 'Negro' },
+  ar: { '푸른': 'أزرق', '붉은': 'أحمر', '노란': 'أصفر', '흰': 'أبيض', '검은': 'أسود' },
+};
+const YEAR_ANIMALS: Record<string, Record<string, string>> = {
+  ko: { '쥐': '쥐', '소': '소', '호랑이': '호랑이', '토끼': '토끼', '용': '용', '뱀': '뱀', '말': '말', '양': '양', '원숭이': '원숭이', '닭': '닭', '개': '개', '돼지': '돼지' },
+  en: { '쥐': 'Rat', '소': 'Ox', '호랑이': 'Tiger', '토끼': 'Rabbit', '용': 'Dragon', '뱀': 'Snake', '말': 'Horse', '양': 'Sheep', '원숭이': 'Monkey', '닭': 'Rooster', '개': 'Dog', '돼지': 'Pig' },
+  jp: { '쥐': '鼠', '소': '牛', '호랑이': '虎', '토끼': '兔', '용': '龍', '뱀': '蛇', '말': '馬', '양': '羊', '원숭이': '猿', '닭': '鶏', '개': '犬', '돼지': '豚' },
+  th: { '쥐': 'หนู', '소': 'วัว', '호랑이': 'เสือ', '토끼': 'กระต่าย', '용': 'มังกร', '뱀': 'งู', '말': 'ม้า', '양': 'แกะ', '원숭이': 'ลิง', '닭': 'ไก่', '개': 'สุนัข', '돼지': 'หมู' },
+  es: { '쥐': 'Rata', '소': 'Buey', '호랑이': 'Tigre', '토끼': 'Conejo', '용': 'Dragón', '뱀': 'Serpiente', '말': 'Caballo', '양': 'Oveja', '원숭이': 'Mono', '닭': 'Gallo', '개': 'Perro', '돼지': 'Cerdo' },
+  ar: { '쥐': 'جرذ', '소': 'ثور', '호랑이': 'نمر', '토끼': 'أرنب', '용': 'تنين', '뱀': 'ثعبان', '말': 'حصان', '양': 'خروف', '원숭이': 'قرد', '닭': 'ديك', '개': 'كلب', '돼지': 'خنزير' },
+};
+function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
+  const key = (lang === 'kr' || lang === 'korean') ? 'ko' : lang;
+  const colors = YEAR_COLORS[key] || YEAR_COLORS.en;
+  const animals = YEAR_ANIMALS[key] || YEAR_ANIMALS.en;
+  const match = koreanPhrase.match(/^(.+?)\s+(.+?)의 해$/);
+  if (!match) return koreanPhrase;
+  const colorKo = match[1];
+  const animalKo = match[2];
+  const color = colors[colorKo] ?? colorKo;
+  const animal = animals[animalKo] ?? animalKo;
+  if (key === 'ko') return `${color} ${animal}의 해`;
+  if (key === 'en') return `${color} ${animal}`;
+  if (key === 'jp') return `${color}${animal}`;
+  if (key === 'es' || key === 'ar') return `${animal} ${color}`; // 스페인어·아랍어: 동물+색
+  return `${color} ${animal}`;
+}
+
        export default function Home() {
   const [inputs, setInputs] = useState({ userName: '', userBirthday: '', userGender: 'Female', idolName: '', language: 'en' });
   const [birthday, setBirthday] = useState({ year: '', month: '', day: '' });
@@ -168,7 +202,9 @@ import * as htmlToImage from 'html-to-image';
       // 로딩 단계
       loadingStep1: "Extracting your bias's surname...",
       loadingStep2: "Creating Korean name...",
-      loadingStep3: "Calculating compatibility..."
+      loadingStep3: "Calculating compatibility...",
+      yearNameIntro: "Your Korean name born in the year of the {0} is",
+      yearNameEnd: "."
     },
     ko: { 
       title: "나의 케이팝 이름", 
@@ -204,7 +240,9 @@ import * as htmlToImage from 'html-to-image';
       // 로딩 단계
       loadingStep1: "최애의 성 추출중...",
       loadingStep2: "한국이름 짓는중...",
-      loadingStep3: "궁합보는중..."
+      loadingStep3: "궁합보는중...",
+      yearNameIntro: "{0}에 태어난 당신의 한국 이름은",
+      yearNameEnd: "입니다."
     },
     jp: {
       title: "私のK-POP名",
@@ -240,7 +278,9 @@ import * as htmlToImage from 'html-to-image';
       // 로딩 단계
       loadingStep1: "推しの姓を抽出中...",
       loadingStep2: "韓国名を作成中...",
-      loadingStep3: "相性を計算中..."
+      loadingStep3: "相性を計算中...",
+      yearNameIntro: "{0}の年に生まれたあなたの韓国名は",
+      yearNameEnd: "です。"
     },
     th: {
       title: "ชื่อ K-POP ของฉัน",
@@ -276,7 +316,9 @@ import * as htmlToImage from 'html-to-image';
       // 로딩 단계
       loadingStep1: "กำลังดึงนามสกุลของเมน...",
       loadingStep2: "กำลังสร้างชื่อเกาหลี...",
-      loadingStep3: "กำลังคำนวณความเข้ากัน..."
+      loadingStep3: "กำลังคำนวณความเข้ากัน...",
+      yearNameIntro: "ชื่อเกาหลีของคุณที่เกิดในปี{0} คือ",
+      yearNameEnd: ""
     },
     es: {
       title: "Mi Nombre K-POP",
@@ -312,7 +354,9 @@ import * as htmlToImage from 'html-to-image';
       // 로딩 단계
       loadingStep1: "Extrayendo el apellido de tu Bias...",
       loadingStep2: "Creando nombre coreano...",
-      loadingStep3: "Calculando compatibilidad..."
+      loadingStep3: "Calculando compatibilidad...",
+      yearNameIntro: "Tu nombre coreano nacido en el año del {0} es",
+      yearNameEnd: "."
     },
     ar: {
       title: "اسم الكيبوب الخاص بي",
@@ -348,7 +392,9 @@ import * as htmlToImage from 'html-to-image';
       // 로딩 단계
       loadingStep1: "جارٍ استخراج لقب البايس...",
       loadingStep2: "جارٍ إنشاء الاسم الكوري...",
-      loadingStep3: "جارٍ حساب التوافق..."
+      loadingStep3: "جارٍ حساب التوافق...",
+      yearNameIntro: "اسمك الكوري المولود في عام {0} هو",
+      yearNameEnd: "."
     }
   };
   
@@ -906,9 +952,27 @@ import * as htmlToImage from 'html-to-image';
                   
                   {idolData.track && <p className="text-[10px] text-pink-300/80 mb-2 font-mono flex items-center justify-center gap-1"><Music className="w-3 h-3" /> {idolData.track}</p>}
                   
+                  {/* ○○의 해 문구 (생일 입력 시): 한글 + 설정 언어 함께 노출 */}
+                  {'year_phrase' in result && result.year_phrase && (
+                    <div className="mb-2 space-y-1">
+                      <p className="text-sm text-pink-200/90">
+                        {result.year_phrase}에 태어난 당신의 한국 이름은
+                      </p>
+                      {inputs.language !== 'ko' && txt.yearNameIntro && (
+                        <p className="text-sm text-purple-200/80">
+                          {txt.yearNameIntro.replace('{0}', getYearPhraseInLanguage(result.year_phrase as string, inputs.language))}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   {/* 한국 이름 + 듣기 버튼 */}
-                  <div className="flex items-center justify-center gap-3 mb-2">
+                  <div className="flex items-center justify-center gap-3 mb-2 flex-wrap">
                     <h2 className="text-5xl font-black text-white drop-shadow-md tracking-tight">{result.korean_name}</h2>
+                    {'year_phrase' in result && result.year_phrase && (
+                      <span className="text-2xl text-white/90 font-medium self-end">
+                        {inputs.language === 'ko' ? '입니다.' : (txt.yearNameEnd || '.')}
+                      </span>
+                    )}
                     <motion.button
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}

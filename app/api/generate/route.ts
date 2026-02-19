@@ -1,7 +1,7 @@
 // app/api/generate/route.ts
 import { NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { selectNameCharacters, selectRandomNameCharacters, MONTH_CHARACTERS, DAY_CHARACTERS, LANGUAGE_MAP, type NameCharacter } from './name-characters-db';
+import { selectRandomNameCharacters, LANGUAGE_MAP, type NameCharacter } from './name-characters-db';
 
 // 1️⃣ K-POP 아이돌 데이터베이스 (활동명 & 본명 & 영문명 통합)
 // 모든 키(key)는 소문자, 띄어쓰기 없이 작성 (검색 최적화)
@@ -463,6 +463,18 @@ function getZodiacSign(month: number, day: number): { sign: string; element: str
   return null;
 }
 
+// 생년 기준 '○○의 해' (간지 띠) 문구 반환. 예: 2024 → "푸른 용의 해", 2026 → "붉은 말의 해"
+function getKoreanYearPhrase(year: number): string | null {
+  if (!Number.isFinite(year) || year < 1900 || year > 2100) return null;
+  const stem = (year - 4) % 10; // 천간 0~9
+  const branch = (year - 4) % 12; // 지지 0~11
+  const colors = ['푸른', '붉은', '노란', '흰', '검은'];
+  const animals = ['쥐', '소', '호랑이', '토끼', '용', '뱀', '말', '양', '원숭이', '닭', '개', '돼지'];
+  const color = colors[Math.floor(stem / 2)];  // 갑을=0, 병정=1, ...
+  const animal = animals[branch];
+  return `${color} ${animal}의 해`;
+}
+
 // 궁합 점수 계산 (생일 기반)
 function calculateCompatibilityScore(birthday?: string): number {
   if (!birthday) return Math.floor(Math.random() * 11) + 85; // 85-95
@@ -501,20 +513,18 @@ export async function POST(req: Request) {
     group: idolDbInfo?.group
   });
 
-  // 생일 정보 처리
+  // 생일: 궁합(호환성 점수·띠)용으로만 사용. 이름 글자 조합에는 사용하지 않음.
   let zodiacInfo: { sign: string; element: string } | null = null;
-  let selectedCharacters: { month: NameCharacter; day: NameCharacter } | null = null;
   if (userBirthday) {
     const [year, month, day] = userBirthday.split('-').map(Number);
     zodiacInfo = getZodiacSign(month, day);
-    selectedCharacters = selectNameCharacters(month, day);
   }
-  // 생일 정보가 없으면 랜덤 선택
-  if (!selectedCharacters) {
-    selectedCharacters = selectRandomNameCharacters();
-  }
+  // 이름 2글자: 성별에 맞는 글자 풀에서 무작위 선택 (여성→은혁 등 남성형 이름 방지)
+  const selectedCharacters = selectRandomNameCharacters(userGender);
   const compatibilityScore = calculateCompatibilityScore(userBirthday);
   const birthdayText = userBirthday ? `Birthday: ${userBirthday}${zodiacInfo ? ` (${zodiacInfo.sign} ${zodiacInfo.element})` : ''}` : '';
+  // 생년 기준 '○○의 해' 문구 (결과 문구용). 예: "푸른 용의 해"
+  const yearPhrase = userBirthday ? getKoreanYearPhrase(Number(userBirthday.split('-')[0])) : null;
   
   // 언어 코드 매핑
   const langKey = LANGUAGE_MAP[language.toLowerCase()] || 'en';
@@ -628,7 +638,7 @@ export async function POST(req: Request) {
     RULES:
     1. Find the idol's REAL Korean surname first
     2. ${selectedCharacters ? `Create the name using EXACTLY these characters: [Surname] + "${selectedCharacters.month.character}" + "${selectedCharacters.day.character}"` : 'Create a 2-syllable given name (총 3글자: 성 1자 + 이름 2자)'}
-    3. Given name should be modern, beautiful, and fit ${userGender}
+    3. Given name MUST match the user's gender: ${userGender}. If Female → clearly feminine Korean name. If Male → clearly masculine. Never give a female user a typically male name (e.g. 은혁, 준혁, 성민) or vice versa.
     4. compatibility_score MUST be exactly "${compatibilityScore}"
     ${zodiacInfo?.sign ? `5. Mention ${zodiacInfo.sign} zodiac in compatibility_reason` : ""}
     
@@ -820,6 +830,7 @@ export async function POST(req: Request) {
         }
       }
       
+      if (yearPhrase != null) (parsedResult as Record<string, unknown>).year_phrase = yearPhrase;
       console.log(`✅ Success with v1beta API/${model}`);
       return NextResponse.json(parsedResult);
       
@@ -960,6 +971,7 @@ export async function POST(req: Request) {
           }
         }
         
+        if (yearPhrase != null) (parsedResult as Record<string, unknown>).year_phrase = yearPhrase;
         console.log(`✅ Success with SDK/${model}`);
         return NextResponse.json(parsedResult);
       } catch (modelError: any) {

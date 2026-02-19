@@ -65,6 +65,11 @@ export const DAY_CHARACTERS: NameCharacter[] = [
   { character: '온', romanized: 'On', type: 'Day', meanings: { ko: '온화하고 따스한', en: 'Gentle and warm', ja: '穏やかで温かい', ar: 'لطيف ودافئ', th: 'อ่อนโยนและอบอุ่น' } },
 ];
 
+// Day 글자 인덱스: 여성 이름에 자주 쓰이는 글자 (은혁·준혁 등 남성형 이름 방지)
+const DAY_INDICES_FEMALE = [2, 12, 13, 14, 16, 17, 20, 21, 22, 23, 24, 25, 26, 27, 29, 30]; // 빈,안,원,우,명,정,율,슬,희,하,린,아,나,봄,결,온
+// Day 글자 인덱스: 남성 이름에 자주 쓰이는 글자
+const DAY_INDICES_MALE = [0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 15, 18, 19, 28]; // 준,찬,혁,휘,호,욱,민,건,성,현,진,재,신,겸,솔
+
 // 언어 코드 매핑 (API language 파라미터 → CSV 언어)
 export const LANGUAGE_MAP: Record<string, keyof NameCharacter['meanings']> = {
   'ko': 'ko',
@@ -97,13 +102,19 @@ export function selectNameCharacters(month: number, day: number): { month: NameC
   return { month: monthChar, day: dayChar };
 }
 
-// 랜덤 글자 선택 함수 (생일 정보가 없을 경우)
-export function selectRandomNameCharacters(): { month: NameCharacter; day: NameCharacter } {
+// 랜덤 글자 선택 함수. gender에 따라 Day 글자를 성별에 맞는 풀에서만 선택 (여성→은혁 등 방지)
+export function selectRandomNameCharacters(gender?: string): { month: NameCharacter; day: NameCharacter } {
   const randomMonth = Math.floor(Math.random() * MONTH_CHARACTERS.length);
-  const randomDay = Math.floor(Math.random() * DAY_CHARACTERS.length);
-  
+  const normalizedGender = (gender || '').toLowerCase();
+  const dayIndices =
+    normalizedGender === 'female'
+      ? DAY_INDICES_FEMALE
+      : normalizedGender === 'male'
+        ? DAY_INDICES_MALE
+        : [...Array(DAY_CHARACTERS.length)].map((_, i) => i);
+  const dayIndex = dayIndices[Math.floor(Math.random() * dayIndices.length)];
   return {
     month: MONTH_CHARACTERS[randomMonth],
-    day: DAY_CHARACTERS[randomDay],
+    day: DAY_CHARACTERS[dayIndex],
   };
 }
