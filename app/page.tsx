@@ -51,8 +51,15 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
          const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [showChangelogModal, setShowChangelogModal] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0); // 0: 성 추출중, 1: 이름 짓는중, 2: 궁합보는중
   const [showLoadingModal, setShowLoadingModal] = useState(false);
+
+  const CHANGELOG_SEEN_KEY = 'myKpopNameChangelogSeen';
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!localStorage.getItem(CHANGELOG_SEEN_KEY)) setShowChangelogModal(true);
+  }, []);
   
   // 생일 입력 자동 이동을 위한 refs
   const monthRef = useRef<HTMLInputElement>(null);
@@ -1117,6 +1124,64 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
         </footer>
       </div>
       <audio ref={audioRef} onEnded={() => setIsPlaying(false)} />
+
+             {/* 업데이트 소식 모달 (첫 진입 시, 영어) */}
+             <AnimatePresence>
+               {showChangelogModal && (
+                 <motion.div
+                   initial={{ opacity: 0 }}
+                   animate={{ opacity: 1 }}
+                   exit={{ opacity: 0 }}
+                   onClick={() => setShowChangelogModal(false)}
+                   className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4 py-8"
+                 >
+                   <motion.div
+                     initial={{ scale: 0.9, y: 10 }}
+                     animate={{ scale: 1, y: 0 }}
+                     exit={{ scale: 0.9, y: 10 }}
+                     onClick={(e) => e.stopPropagation()}
+                     className="w-full max-w-lg max-h-[85vh] bg-[#0a0a0a] border border-white/20 rounded-2xl shadow-2xl flex flex-col"
+                   >
+                     <div className="flex items-center justify-between p-5 border-b border-white/10">
+                       <h2 className="text-base font-bold text-white">What&apos;s New (2026.02.19)</h2>
+                       <button
+                         type="button"
+                         onClick={() => setShowChangelogModal(false)}
+                         className="text-gray-400 hover:text-white text-lg font-semibold transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10"
+                         aria-label="Close"
+                       >
+                         ✕
+                       </button>
+                     </div>
+                     <div className="flex-1 overflow-y-auto p-5 text-gray-300 text-sm leading-relaxed space-y-3">
+                       <p className="font-semibold text-pink-200">1. More diverse name combinations</p>
+                       <p>Names are now generated from a wider pool of characters each time, so you get more variety instead of the same combinations (e.g. same bias + same birthday no longer always gives the same name).</p>
+                       <p className="font-semibold text-pink-200">2. Birth year zodiac (Korean &ldquo;띠&rdquo; / Ganzhi) added</p>
+                       <p>If you enter your birthday, we show phrases like &ldquo;year of the White Rabbit&rdquo; or &ldquo;Blue Dragon&rdquo; with your Korean name. The sentence is shown in both Korean and your selected language.</p>
+                     </div>
+                     <div className="p-5 border-t border-white/10 flex gap-3">
+                       <button
+                         type="button"
+                         onClick={() => setShowChangelogModal(false)}
+                         className="flex-1 bg-white/10 text-white font-semibold py-2.5 rounded-xl hover:bg-white/20 transition-all"
+                       >
+                         Close
+                       </button>
+                       <button
+                         type="button"
+                         onClick={() => {
+                           try { localStorage.setItem(CHANGELOG_SEEN_KEY, '260219'); } catch (_) {}
+                           setShowChangelogModal(false);
+                         }}
+                         className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold py-2.5 rounded-xl hover:from-pink-500 hover:to-purple-500 transition-all"
+                       >
+                         Don&apos;t show again
+                       </button>
+                     </div>
+                   </motion.div>
+                 </motion.div>
+               )}
+             </AnimatePresence>
 
              {/* 개인정보/쿠키 안내 모달 */}
              <AnimatePresence>
