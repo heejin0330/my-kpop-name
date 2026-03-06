@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy, Sparkles, PenTool } from 'lucide-react';
+import { Search, Globe, Volume2, VolumeX, Loader2, Music, Heart, Download, Share2, Copy, Sparkles, PenTool, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as htmlToImage from 'html-to-image';
 
@@ -44,21 +44,24 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
   const [birthday, setBirthday] = useState({ year: '', month: '', day: '' });
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
-  const [idolData, setIdolData] = useState({ image: '', track: '', previewUrl: '' });
+  const [idolData, setIdolData] = useState({ image: '', track: '', previewUrl: '', displayName: '' });
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [resolvedIdol, setResolvedIdol] = useState<{ group?: string; searchTerm?: string; surname?: string; surnameEn?: string } | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
          const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showChangelogModal, setShowChangelogModal] = useState(false);
-  const [loadingStep, setLoadingStep] = useState(0); // 0: 성 추출중, 1: 이름 짓는중, 2: 궁합보는중
+  const [loadingStep, setLoadingStep] = useState(0);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [openChangelog, setOpenChangelog] = useState<number | null>(0);
 
   const CHANGELOG_SEEN_KEY = 'myKpopNameChangelogSeen';
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (!localStorage.getItem(CHANGELOG_SEEN_KEY)) setShowChangelogModal(true);
+    const seen = localStorage.getItem(CHANGELOG_SEEN_KEY);
+    if (!seen || seen < '260306') setShowChangelogModal(true);
   }, []);
   
   // 생일 입력 자동 이동을 위한 refs
@@ -410,7 +413,62 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
   // 아랍어일 경우 RTL(오른쪽 정렬) 적용
   const isRTL = inputs.language === 'ar';
 
-  // 🔍 최애 검색 (여러 결과 표시)
+  // iTunes 검색 공통 로직
+  const searchItunes = async (searchTerm: string, limit: number = 25) => {
+    const term = `${searchTerm} kpop`;
+    const res = await fetch(
+      `https://itunes.apple.com/search?term=${encodeURIComponent(
+        term
+      )}&entity=song&media=music&country=KR&limit=${limit}`
+    );
+    const data = await res.json();
+    
+    if (data.resultCount === 0) return [];
+    
+    const artistMap = new Map();
+    data.results.forEach((song: any) => {
+      const genre = (song.primaryGenreName || '').toLowerCase();
+      const collection = (song.collectionName || '').toLowerCase();
+      const isKoreanKpop =
+        genre.includes('k-pop') ||
+        collection.includes('k-pop') ||
+        collection.includes('korea') ||
+        collection.includes('korean');
+
+      if (!isKoreanKpop) return;
+
+      const artistName = song.artistName.toLowerCase();
+      if (!artistMap.has(artistName)) {
+        artistMap.set(artistName, {
+          artistName: song.artistName,
+          trackName: song.trackName,
+          artworkUrl: song.artworkUrl100.replace('100x100', '600x600'),
+          previewUrl: song.previewUrl,
+          collectionName: song.collectionName || ''
+        });
+      }
+    });
+
+    if (artistMap.size === 0) {
+      data.results.forEach((song: any) => {
+        if (!song.previewUrl) return;
+        const artistName = song.artistName.toLowerCase();
+        if (!artistMap.has(artistName)) {
+          artistMap.set(artistName, {
+            artistName: song.artistName,
+            trackName: song.trackName,
+            artworkUrl: song.artworkUrl100.replace('100x100', '600x600'),
+            previewUrl: song.previewUrl,
+            collectionName: song.collectionName || ''
+          });
+        }
+      });
+    }
+
+    return Array.from(artistMap.values());
+  };
+
+  // 🔍 최애 검색: resolve-idol → 그룹명 확인 → 그룹명으로 iTunes 검색
   const searchIdol = async () => {
     if (inputs.idolName.length < 2) {
       setSearchResults([]);
@@ -422,63 +480,42 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
     setShowSearchResults(true);
     
     try {
-      // 🇰🇷 한국 K-POP 위주로 검색 (KR 스토어 + 음악 + 곡 기준)
-      // 최애 이름으로만 검색하면 다른 국가/장르가 섞일 수 있어 "이름 + kpop" 형태로 검색어를 구성
-      const term = `${inputs.idolName} kpop`;
-      const res = await fetch(
-        `https://itunes.apple.com/search?term=${encodeURIComponent(
-          term
-        )}&entity=song&media=music&country=KR&limit=25`
-      );
-      const data = await res.json();
-      
-      if (data.resultCount > 0) {
-        // 아티스트별로 그룹화 (같은 아티스트의 여러 곡 중 첫 번째만)
-        const artistMap = new Map();
-        data.results.forEach((song: any) => {
-          // 1차: K-POP / 한국 아티스트 우선 필터링
-          const genre = (song.primaryGenreName || '').toLowerCase();
-          const collection = (song.collectionName || '').toLowerCase();
-          const isKoreanKpop =
-            genre.includes('k-pop') ||
-            collection.includes('k-pop') ||
-            collection.includes('korea') ||
-            collection.includes('korean');
-
-          if (!isKoreanKpop) return;
-
-          const artistName = song.artistName.toLowerCase();
-          if (!artistMap.has(artistName)) {
-            artistMap.set(artistName, {
-              artistName: song.artistName,
-              trackName: song.trackName,
-              artworkUrl: song.artworkUrl100.replace('100x100', '600x600'),
-              previewUrl: song.previewUrl,
-              collectionName: song.collectionName || ''
-            });
-          }
+      // 1단계: resolve-idol API로 아이돌 그룹 확인
+      let searchTerm = inputs.idolName;
+      try {
+        const resolveRes = await fetch('/api/resolve-idol', {
+          method: 'POST',
+          body: JSON.stringify({ idolName: inputs.idolName }),
         });
-
-        // 2차: K-POP 필터로 아무 것도 안 남으면, 전체 결과에서 다시 한 번 구성 (fallback)
-        if (artistMap.size === 0) {
-          data.results.forEach((song: any) => {
-            if (!song.previewUrl) return;
-            const artistName = song.artistName.toLowerCase();
-            if (!artistMap.has(artistName)) {
-              artistMap.set(artistName, {
-                artistName: song.artistName,
-                trackName: song.trackName,
-                artworkUrl: song.artworkUrl100.replace('100x100', '600x600'),
-                previewUrl: song.previewUrl,
-                collectionName: song.collectionName || ''
-              });
-            }
+        const resolveData = await resolveRes.json();
+        
+        if (resolveData.found && resolveData.searchTerm) {
+          searchTerm = resolveData.searchTerm;
+          setResolvedIdol({
+            group: resolveData.group,
+            searchTerm: resolveData.searchTerm,
+            surname: resolveData.surname,
+            surnameEn: resolveData.surnameEn,
           });
+          console.log(`✅ Resolved idol: "${inputs.idolName}" → group: "${resolveData.group}", searchTerm: "${resolveData.searchTerm}"`);
+        } else {
+          setResolvedIdol(null);
         }
-
-        setSearchResults(Array.from(artistMap.values()));
+      } catch (resolveError) {
+        console.warn('⚠️ resolve-idol failed, using original name:', resolveError);
+        setResolvedIdol(null);
+      }
+      
+      // 2단계: 확인된 그룹명(또는 원래 이름)으로 iTunes 검색
+      const results = await searchItunes(searchTerm);
+      
+      // 그룹명으로 검색했는데 결과가 없으면 원래 이름으로 재시도
+      if (results.length === 0 && searchTerm !== inputs.idolName) {
+        console.log(`⚠️ No results for "${searchTerm}", retrying with "${inputs.idolName}"`);
+        const fallbackResults = await searchItunes(inputs.idolName);
+        setSearchResults(fallbackResults);
       } else {
-        setSearchResults([]);
+        setSearchResults(results);
       }
     } catch (e) {
       console.error('Search error:', e);
@@ -489,13 +526,16 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
   };
 
   // ✅ 최애 선택
+  // IMPORTANT: inputs.idolName(사용자가 입력한 편애 멤버 이름)은 절대 덮어쓰지 않는다.
+  // iTunes 검색 결과의 artistName(그룹명 등)은 idolData에만 저장해 표시/미리듣기용으로 쓴다.
+  // 이렇게 해야 "지민"을 입력했는데 "방탄소년단"으로 치환되어 다른 멤버가 매칭되는 사고를 방지한다.
   const selectIdol = (selected: any) => {
     setIdolData({
       image: selected.artworkUrl,
       track: `${selected.trackName} - ${selected.artistName}`,
-      previewUrl: selected.previewUrl
+      previewUrl: selected.previewUrl,
+      displayName: selected.artistName
     });
-    setInputs({ ...inputs, idolName: selected.artistName });
     setShowSearchResults(false);
     setSearchResults([]);
   };
@@ -514,26 +554,49 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
     if (!currentPreviewUrl && inputs.idolName) {
       console.log('🔍 No previewUrl found, attempting to search for idol:', inputs.idolName);
       try {
-        const term = `${inputs.idolName} kpop`;
-        const res = await fetch(
-          `https://itunes.apple.com/search?term=${encodeURIComponent(
-            term
-          )}&entity=song&media=music&country=KR&limit=5`
-        );
-        const searchData = await res.json();
+        // resolve-idol로 그룹명 확인 후 그룹명으로 iTunes 검색
+        let searchTerm = inputs.idolName;
+        if (resolvedIdol?.searchTerm) {
+          searchTerm = resolvedIdol.searchTerm;
+        } else {
+          try {
+            const resolveRes = await fetch('/api/resolve-idol', {
+              method: 'POST',
+              body: JSON.stringify({ idolName: inputs.idolName }),
+            });
+            const resolveData = await resolveRes.json();
+            if (resolveData.found && resolveData.searchTerm) {
+              searchTerm = resolveData.searchTerm;
+              setResolvedIdol({
+                group: resolveData.group,
+                searchTerm: resolveData.searchTerm,
+                surname: resolveData.surname,
+                surnameEn: resolveData.surnameEn,
+              });
+            }
+          } catch { /* fallback to original name */ }
+        }
+
+        const results = await searchItunes(searchTerm, 5);
         
-        if (searchData.resultCount > 0) {
-          // 첫 번째 결과 사용
-          const firstSong = searchData.results.find((song: any) => song.previewUrl) || searchData.results[0];
-          if (firstSong && firstSong.previewUrl) {
+        // 그룹명으로 못 찾으면 원래 이름으로 재시도
+        let songs = results;
+        if (songs.length === 0 && searchTerm !== inputs.idolName) {
+          songs = await searchItunes(inputs.idolName, 5);
+        }
+        
+        if (songs.length > 0) {
+          const firstSong = songs[0];
+          if (firstSong.previewUrl) {
             currentIdolData = {
-              image: firstSong.artworkUrl100?.replace('100x100', '600x600') || '',
+              image: firstSong.artworkUrl,
               track: `${firstSong.trackName} - ${firstSong.artistName}`,
-              previewUrl: firstSong.previewUrl
+              previewUrl: firstSong.previewUrl,
+              displayName: firstSong.artistName
             };
             currentPreviewUrl = firstSong.previewUrl;
             setIdolData(currentIdolData);
-            console.log('✅ Found previewUrl for idol:', firstSong.previewUrl);
+            console.log('✅ Found previewUrl for idol via group search:', firstSong.previewUrl);
           }
         }
       } catch (searchError) {
@@ -579,9 +642,30 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       
       setResult(data);
       setShowLoadingModal(false);
+
+      // generate API에서 반환한 idol_group으로 resolvedIdol 업데이트
+      if (data.idol_group) {
+        setResolvedIdol(prev => ({ ...prev, group: data.idol_group, searchTerm: data.idol_group }));
+      }
+      
+      // idol_group이 있는데 previewUrl이 없으면 그룹명으로 iTunes 재검색
+      if (!currentPreviewUrl && data.idol_group) {
+        try {
+          const groupSongs = await searchItunes(data.idol_group, 5);
+          if (groupSongs.length > 0 && groupSongs[0].previewUrl) {
+            currentIdolData = {
+              image: groupSongs[0].artworkUrl,
+              track: `${groupSongs[0].trackName} - ${groupSongs[0].artistName}`,
+              previewUrl: groupSongs[0].previewUrl,
+              displayName: groupSongs[0].artistName
+            };
+            currentPreviewUrl = groupSongs[0].previewUrl;
+            setIdolData(currentIdolData);
+          }
+        } catch { /* ignore */ }
+      }
       
       // 음악 자동 재생 (사용자 상호작용 후이므로 가능)
-      // currentPreviewUrl 또는 업데이트된 idolData 사용
       const previewUrlToUse = currentPreviewUrl || idolData.previewUrl;
       
       console.log('🎵 Music playback check:', {
@@ -1143,7 +1227,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
                      className="w-full max-w-lg max-h-[85vh] bg-[#0a0a0a] border border-white/20 rounded-2xl shadow-2xl flex flex-col"
                    >
                      <div className="flex items-center justify-between p-5 border-b border-white/10">
-                       <h2 className="text-base font-bold text-white">What&apos;s New (2026.02.19)</h2>
+                       <h2 className="text-base font-bold text-white">What&apos;s New</h2>
                        <button
                          type="button"
                          onClick={() => setShowChangelogModal(false)}
@@ -1153,11 +1237,52 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
                          ✕
                        </button>
                      </div>
-                     <div className="flex-1 overflow-y-auto p-5 text-gray-300 text-sm leading-relaxed space-y-3">
-                       <p className="font-semibold text-pink-200">1. More diverse name combinations</p>
-                       <p>Names are now generated from a wider pool of characters each time, so you get more variety instead of the same combinations (e.g. same bias + same birthday no longer always gives the same name).</p>
-                       <p className="font-semibold text-pink-200">2. Birth year zodiac (Korean &ldquo;띠&rdquo; / Ganzhi) added</p>
-                       <p>If you enter your birthday, we show phrases like &ldquo;year of the White Rabbit&rdquo; or &ldquo;Blue Dragon&rdquo; with your Korean name. The sentence is shown in both Korean and your selected language.</p>
+                     <div className="flex-1 overflow-y-auto p-5 text-gray-300 text-sm leading-relaxed space-y-0">
+                       {[
+                         {
+                           id: 0,
+                           date: '2026.03.06',
+                           title: 'Improved idol search accuracy',
+                           body: 'Fixed an issue where searching for an idol by their Korean activity name (e.g. "펠릭스" for Felix) would fail to find the correct group and music. The system now resolves the idol\'s group first and searches music by group name.',
+                         },
+                         {
+                           id: 1,
+                           date: '2026.02.19',
+                           title: 'More diverse name combinations',
+                           body: 'Names are now generated from a wider pool of characters each time, so you get more variety instead of the same combinations (e.g. same bias + same birthday no longer always gives the same name).',
+                         },
+                         {
+                           id: 2,
+                           date: '2026.02.19',
+                           title: 'Birth year zodiac (Korean "띠" / Ganzhi) added',
+                           body: 'If you enter your birthday, we show phrases like "year of the White Rabbit" or "Blue Dragon" with your Korean name. The sentence is shown in both Korean and your selected language.',
+                         },
+                       ].map((item) => (
+                         <div key={item.id} className="border-b border-white/5 last:border-b-0">
+                           <button
+                             type="button"
+                             onClick={() => setOpenChangelog(openChangelog === item.id ? null : item.id)}
+                             className="w-full flex items-center gap-2 py-3 text-left group"
+                           >
+                             <ChevronDown className={`w-4 h-4 text-pink-400 shrink-0 transition-transform duration-200 ${openChangelog === item.id ? 'rotate-180' : ''}`} />
+                             <span className="font-semibold text-pink-200 group-hover:text-pink-100 transition-colors">{item.title}</span>
+                             <span className="text-[10px] text-gray-500 shrink-0 ml-auto">{item.date}</span>
+                           </button>
+                           <AnimatePresence>
+                             {openChangelog === item.id && (
+                               <motion.div
+                                 initial={{ height: 0, opacity: 0 }}
+                                 animate={{ height: 'auto', opacity: 1 }}
+                                 exit={{ height: 0, opacity: 0 }}
+                                 transition={{ duration: 0.2 }}
+                                 className="overflow-hidden"
+                               >
+                                 <p className="pb-3 pl-6 text-gray-400 text-[13px] leading-relaxed">{item.body}</p>
+                               </motion.div>
+                             )}
+                           </AnimatePresence>
+                         </div>
+                       ))}
                      </div>
                      <div className="p-5 border-t border-white/10 flex gap-3">
                        <button
@@ -1170,7 +1295,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
                        <button
                          type="button"
                          onClick={() => {
-                           try { localStorage.setItem(CHANGELOG_SEEN_KEY, '260219'); } catch (_) {}
+                           try { localStorage.setItem(CHANGELOG_SEEN_KEY, '260306'); } catch (_) {}
                            setShowChangelogModal(false);
                          }}
                          className="flex-1 bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold py-2.5 rounded-xl hover:from-pink-500 hover:to-purple-500 transition-all"

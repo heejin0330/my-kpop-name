@@ -1,0 +1,29 @@
+---
+description: Changelog modal update rules - how to add new entries to the What's New modal
+globs: app/page.tsx
+alwaysApply: false
+---
+
+# Changelog Modal Update Rules
+
+When the user requests adding a changelog entry after a feature update:
+
+1. **Add to the top** of the changelog array in `app/page.tsx` (newest first). Use incrementing `id` starting from 0 for the newest item, and shift existing items' `id` values accordingly.
+
+2. **Format** for each entry:
+   ```tsx
+   {
+     id: 0,           // 0 = newest, higher = older
+     date: 'YYYY.MM.DD',
+     title: 'Short title of the update',
+     body: 'Brief 1-2 sentence description for end users.',
+   },
+   ```
+
+3. **Body text** must be concise (1-2 sentences max). It is user-facing, not developer-facing.
+
+4. **Update the localStorage version key** (`CHANGELOG_SEEN_KEY` value in the "Don't show again" button) to match today's date in `YYMMDD` format so returning users see the new entry.
+
+5. **Update the version check** in the `useEffect` that compares `seen < 'YYMMDD'` to use the same new date string.
+
+6. **Set `openChangelog` default** to `0` so the newest entry is expanded by default when the modal opens.
