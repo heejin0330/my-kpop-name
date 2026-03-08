@@ -778,7 +778,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       `}</style>
 
       <div
-        className="absolute inset-0 bg-contain bg-bottom md:bg-cover md:bg-center bg-no-repeat opacity-50 pointer-events-none"
+        className="absolute inset-0 bg-contain bg-top md:bg-cover md:bg-center bg-no-repeat opacity-50 pointer-events-none"
         style={{ backgroundImage: "url('/hanbok-silhouettes-bg.png')" }}
       />
 
