@@ -183,7 +183,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       optFemale: "Girl 👧", optMale: "Boy 👦", optUnisex: "Unisex ✨",
       lblBias: "Who is your Ultimate Bias?", 
       phBias: "e.g. Jennie, RM",
-      btn: "Check Chemistry & Get Name ✨", 
+      btn: "Get My Zodiac & Korean Name ✨", 
       loading: "Asking your Bias...",
       // 결과창 라벨
       resScore: "MATCH SCORE",
@@ -227,7 +227,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       optFemale: "여성 👧", optMale: "남성 👦", optUnisex: "무관 ✨",
       lblBias: "당신의 '최애'는 누구인가요?", 
       phBias: "예: 제니, RM",
-      btn: "궁합 보고 이름 짓기 ✨", 
+      btn: "나의 띠와 한국이름 보기 ✨", 
       loading: "최애에게 허락받는 중...",
       resScore: "궁합 점수",
       resReason: "우리가 천생연분인 이유 🔥",
@@ -265,7 +265,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       optFemale: "女性 👧", optMale: "男性 👦", optUnisex: "性別なし ✨",
       lblBias: "あなたの「最推し」は誰ですか？",
       phBias: "例: Jennie, RM",
-      btn: "相性チェック & 名前作成 ✨",
+      btn: "私の干支と韓国名を見る ✨",
       loading: "推しに許可をもらっています...",
       resScore: "相性スコア",
       resReason: "相性抜群の理由 🔥",
@@ -303,7 +303,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       optFemale: "หญิง 👧", optMale: "ชาย 👦", optUnisex: "ไม่ระบุ ✨",
       lblBias: "เมน (Ultimate Bias) ของคุณคือใคร?",
       phBias: "เช่น Lisa, BamBam",
-      btn: "เช็คความเข้ากัน & ตั้งชื่อ ✨",
+      btn: "ดูนักษัตรและชื่อเกาหลีของฉัน ✨",
       loading: "กำลังขออนุญาตเมนของคุณ...",
       resScore: "คะแนนความเข้ากัน",
       resReason: "ทำไมถึงเข้ากันได้ดี? 🔥",
@@ -341,7 +341,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       optFemale: "Mujer 👧", optMale: "Hombre 👦", optUnisex: "Unisex ✨",
       lblBias: "¿Quién es tu Bias Supremo?",
       phBias: "ej. V, Karina",
-      btn: "Ver Química y Obtener Nombre ✨",
+      btn: "Ver Mi Zodíaco y Nombre Coreano ✨",
       loading: "Pidiendo permiso a tu Bias...",
       resScore: "PUNTUACIÓN",
       resReason: "¿Por qué hacemos match? 🔥",
@@ -379,7 +379,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       optFemale: "أنثى 👧", optMale: "ذكر 👦", optUnisex: "غير محدد ✨",
       lblBias: "من هو البايس الخاص بك؟",
       phBias: "مثال: Jimin, RM",
-      btn: "تحقق من التوافق واحصل على الاسم ✨",
+      btn: "اكتشف برجي واسمي الكوري ✨",
       loading: "جاري طلب الإذن من البايس...",
       resScore: "نتيجة التوافق",
       resReason: "لماذا هذا التوافق؟ 🔥",
@@ -771,12 +771,16 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
   };
 
   return (
-    <div className={`min-h-screen bg-[#050505] text-white font-sans flex items-center justify-center p-4 selection:bg-pink-500 selection:text-white ${isRTL ? 'font-arabic' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
-      {/* 폰트 로드 (Next.js 방식이 아니므로 HTML style 태그 활용) */}
+    <div className={`relative min-h-screen bg-[#050505] text-white font-sans flex items-center justify-center p-4 selection:bg-pink-500 selection:text-white overflow-hidden ${isRTL ? 'font-arabic' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+Thai&family=Noto+Sans+Arabic&display=swap');
         .font-arabic { font-family: 'Noto Sans Arabic', sans-serif; }
       `}</style>
+
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50 pointer-events-none"
+        style={{ backgroundImage: "url('/hanbok-silhouettes-bg.png')" }}
+      />
 
       <div className="fixed top-0 left-0 w-64 h-64 bg-purple-600 rounded-full blur-[100px] opacity-20 -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
       <div className="fixed bottom-0 right-0 w-64 h-64 bg-pink-600 rounded-full blur-[100px] opacity-20 translate-x-1/2 translate-y-1/2 pointer-events-none" />
@@ -1167,7 +1171,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
                   </button>
                 </motion.div>
                 
-                {/* Ko-fi 후원 버튼 */}
+                {/* 후원 버튼 */}
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -1175,15 +1179,54 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
                   className="mt-6 text-center"
                 >
                   <p className="text-sm text-gray-400 mb-3">{txt.kofiText}</p>
-                  <a
-                    href="https://ko-fi.com/YOUR_USERNAME"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#29ABE0] hover:bg-[#2389C4] text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-[#29ABE0]/30"
-                  >
-                    <span>☕</span>
-                    <span>Buy me a coffee</span>
-                  </a>
+                  <div className="flex flex-col items-center gap-4">
+                    {/* Send me a passion */}
+                    <motion.div whileTap={{ scale: 0.95 }} className="group flex flex-col items-center gap-1.5">
+                      <a
+                        href="https://www.buymeacoffee.com/padalabs_harang"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative"
+                      >
+                        <img
+                          src="https://img.buymeacoffee.com/button-api/?text=send me a passion&emoji=😘&slug=padalabs_harang&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"
+                          alt="Send me a passion"
+                          className="h-10 rounded-lg"
+                        />
+                        <span className="hidden md:flex pointer-events-none absolute left-1/2 -translate-x-1/2 -bottom-11 flex-col items-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-y-0 translate-y-1 z-50">
+                          <span className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-yellow-400/90" />
+                          <span className="whitespace-nowrap text-[11px] font-medium text-gray-900 bg-yellow-400/90 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-lg">
+                            개발자 데뷔 앨범 펀딩 중! 💿 여러분의 화력으로 1위 시켜주세요!
+                          </span>
+                        </span>
+                      </a>
+                      <p className="md:hidden text-[10px] text-yellow-300/70 leading-tight">
+                        개발자 데뷔 앨범 펀딩 중! 💿 여러분의 화력으로 1위 시켜주세요!
+                      </p>
+                    </motion.div>
+
+                    {/* Buy me a coffee */}
+                    <motion.div whileTap={{ scale: 0.95 }} className="group flex flex-col items-center gap-1.5 mt-1">
+                      <a
+                        href="https://ko-fi.com/YOUR_USERNAME"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative inline-flex items-center gap-2 px-6 py-3 bg-[#29ABE0] hover:bg-[#2389C4] text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-[#29ABE0]/30"
+                      >
+                        <span>☕</span>
+                        <span>Buy me a coffee</span>
+                        <span className="hidden md:flex pointer-events-none absolute left-1/2 -translate-x-1/2 -bottom-11 flex-col items-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-y-0 translate-y-1 z-50">
+                          <span className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-b-[6px] border-b-sky-400/90" />
+                          <span className="whitespace-nowrap text-[11px] font-medium text-white bg-sky-500/90 backdrop-blur-sm rounded-lg px-3 py-1.5 shadow-lg">
+                            다음 업데이트 컴백을 위한 카페인이 필요해요 ☕
+                          </span>
+                        </span>
+                      </a>
+                      <p className="md:hidden text-[10px] text-sky-300/70 leading-tight">
+                        다음 업데이트 컴백을 위한 카페인이 필요해요 ☕
+                      </p>
+                    </motion.div>
+                  </div>
                 </motion.div>
               </motion.div>
             )}
