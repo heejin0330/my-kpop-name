@@ -209,6 +209,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       sameSurname: "Same Family Name",
       // Ko-fi
       kofiText: "Enjoyed? Support the developer! ☕",
+      supportAlbum: "Support the developer's debut album! 💿",
       // 로딩 단계
       loadingStep1: "Extracting your bias's surname...",
       loadingStep2: "Creating Korean name...",
@@ -247,6 +248,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       searchSelect: "선택",
       sameSurname: "같은 성씨",
       kofiText: "재밌으셨나요? 개발자에게 커피 한잔! ☕",
+      supportAlbum: "개발자의 데뷔 앨범을 응원해주세요! 💿",
       // 로딩 단계
       loadingStep1: "최애의 성 추출중...",
       loadingStep2: "한국이름 짓는중...",
@@ -285,6 +287,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       searchSelect: "選択",
       sameSurname: "同じ姓",
       kofiText: "楽しんでいただけましたか？開発者にコーヒーを一杯！ ☕",
+      supportAlbum: "開発者のデビューアルバムを応援してください！ 💿",
       // 로딩 단계
       loadingStep1: "推しの姓を抽出中...",
       loadingStep2: "韓国名を作成中...",
@@ -323,6 +326,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       searchSelect: "เลือก",
       sameSurname: "นามสกุลเดียวกัน",
       kofiText: "สนุกไหม? รองรับนักพัฒนา! ☕",
+      supportAlbum: "สนับสนุนอัลบั้มเดบิวต์ของนักพัฒนา! 💿",
       // 로딩 단계
       loadingStep1: "กำลังดึงนามสกุลของเมน...",
       loadingStep2: "กำลังสร้างชื่อเกาหลี...",
@@ -361,6 +365,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       searchSelect: "Seleccionar",
       sameSurname: "Mismo apellido",
       kofiText: "¿Te gustó? ¡Apoya al desarrollador! ☕",
+      supportAlbum: "¡Apoya el álbum debut del desarrollador! 💿",
       // 로딩 단계
       loadingStep1: "Extrayendo el apellido de tu Bias...",
       loadingStep2: "Creando nombre coreano...",
@@ -399,6 +404,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
       searchSelect: "اختر",
       sameSurname: "نفس اللقب",
       kofiText: "استمتعت؟ ادعم المطور! ☕",
+      supportAlbum: "!💿 ادعم ألبوم المطور الأول",
       // 로딩 단계
       loadingStep1: "جارٍ استخراج لقب البايس...",
       loadingStep2: "جارٍ إنشاء الاسم الكوري...",
@@ -982,7 +988,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
             </button>
 
             <div className="mt-5 flex flex-col items-center gap-1.5">
-              <p className="text-[11px] text-yellow-300/70">개발자의 데뷔 앨범을 응원해주세요! 💿</p>
+              <p className="text-[11px] text-yellow-300/70">{txt.supportAlbum}</p>
               <motion.div whileTap={{ scale: 0.95 }}>
                 <a
                   href="https://www.buymeacoffee.com/padalabs_harang"
