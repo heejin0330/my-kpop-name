@@ -980,6 +980,23 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
             >
               {loading ? <Loader2 className="animate-spin" /> : txt.btn}
             </button>
+
+            <div className="mt-5 flex flex-col items-center gap-1.5">
+              <p className="text-[11px] text-yellow-300/70">개발자의 데뷔 앨범을 응원해주세요! 💿</p>
+              <motion.div whileTap={{ scale: 0.95 }}>
+                <a
+                  href="https://www.buymeacoffee.com/padalabs_harang"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    src="https://img.buymeacoffee.com/button-api/?text=send me a passion&emoji=😘&slug=padalabs_harang&button_colour=FFDD00&font_colour=000000&font_family=Comic&outline_colour=000000&coffee_colour=ffffff"
+                    alt="Send me a passion"
+                    className="h-9 rounded-lg"
+                  />
+                </a>
+              </motion.div>
+            </div>
           </div>
 
           <AnimatePresence>
