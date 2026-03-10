@@ -771,7 +771,7 @@ function getYearPhraseInLanguage(koreanPhrase: string, lang: string): string {
   };
 
   return (
-    <div className={`relative min-h-screen bg-[#050505] text-white font-sans flex items-center justify-center p-4 selection:bg-pink-500 selection:text-white overflow-hidden ${isRTL ? 'font-arabic' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
+    <div className={`relative min-h-screen bg-[#050505] text-white font-sans flex items-start md:items-center justify-center pt-44 md:pt-4 p-4 selection:bg-pink-500 selection:text-white overflow-hidden ${isRTL ? 'font-arabic' : ''}`} style={{ direction: isRTL ? 'rtl' : 'ltr' }}>
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&family=Noto+Sans+Thai&family=Noto+Sans+Arabic&display=swap');
         .font-arabic { font-family: 'Noto Sans Arabic', sans-serif; }
